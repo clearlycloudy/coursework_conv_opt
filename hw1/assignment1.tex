@@ -1,0 +1,142 @@
+\documentclass[12pt,letter]{article}
+
+%% \usepackage[fleqn]{amsmath}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amsfonts,amsthm,bm}
+\usepackage{breqn}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{tikz}
+\usepackage{algorithm2e}
+\usepackage{siunitx}
+\usepackage{graphicx}
+\usepackage{subcaption}
+%% \usepackage{datetime}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{mathrsfs}
+\usepackage{fancyhdr}
+\usepackage{fancyvrb}
+\usepackage{parskip} %turns off paragraph indent
+\pagestyle{fancy}
+
+\usetikzlibrary{arrows}
+
+\DeclareMathOperator*{\argmin}{argmin}
+\newcommand*{\argminl}{\argmin\limits}
+
+\newcommand{\mathleft}{\@fleqntrue\@mathmargin0pt}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\ppartial}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\norm}[1]{\|#1\|}
+\newcommand{\set}[1]{\{#1\}}
+
+\setcounter{MaxMatrixCols}{20}
+
+\begin {document}
+
+\lhead{Convex Optimization - HW1}
+\rhead{Yuan Liu, 996954078, 2020/01/20}
+
+\begin{enumerate}
+\item Consider the function $f(x)=-\sum_i^m log(b_i-a_i^Tx)$. Compute $\nabla f$ and $\nabla^2 f$. Write down the first three terms of the Taylor series expansion of $f(x)$ around some $x_0$.\\
+  \begin{align*}
+    \ppartial{f}{x_j} &= -\sum_i^m \frac{1}{b_i-a_i^T x} \ppartial{(b_i-a_i^Tx)}{x_j}, j=1,..,n\\
+                      &= -\sum_i^m \frac{1}{b_i-a_i^T x} (-a_{ij})\\
+                      &= \sum_i^m \frac{a_{ij}}{b_i-a_i^T x}\\
+    \\
+    \ppartial{^2 f}{x_{jk}} &= \ppartial{\sum_i^m \frac{a_{ij}}{b_i-a_i^T x}}{x_k}, j=1,..,n, , k=1,..,n\\
+                      &= -\sum_i^m \frac{a_{ij}}{(b_i-a_i^T x)^2}\ppartial{(b_i-a_i^T x)}{x_k}\\
+                      &= \sum_i^m \frac{a_{ij}}{(b_i-a_i^T x)^2}(a_{ik})\\
+                      &= \sum_i^m \frac{a_{ij}a_{ik}}{(b_i-a_i^T x)^2}\\
+    f(x) &= \sum_{i=0}^{\infty} \frac{f^i(x_0)(x-x_0)^i}{i!}\\
+                      &=f(x_0)+f^{(1)}(x_0)(x-x_0)+\frac{1}{2}f^{(2)}(x_0)(x-x_0)^2+o((x-a)^3)\\
+                      &=(-\sum_i^m log(b_i-a_i^Tx_0))_:+
+    (\sum_i^m \frac{a_{ij}}{b_i-a_i^T x})^T (x-x_0)+
+    \frac{1}{2} (x-x_0)^T (\sum_i^m \frac{a_{ij}a_{ik}}{(b_i-a_i^T x)^2})_{:,:} (x-x_0)\\
+    \\
+  \end{align*}
+  
+  \pagebreak
+  
+\item 2.5 from textbook.\\
+  What is the distance between two parallel hyperplanes $\{x \in \R^n : a^Tx = b_1 \}$ and $\{x \in R^n : a^T x = b_2 \}$?\\
+  Shortest displacement will be in the direction of $a$ with scaling factor $\beta$, thus we solve for $|\beta|$ in the following.
+  \begin{align*}
+    a^T x_1 &= b_1\\
+    a^T x_2 &= b_2\\
+    x_1 &= x_2 + \beta a, \beta \in \R\\
+    a^T (x_2+\beta a) &= b_1\\
+    a^T x_2+ a^T \beta a) &= b_1\\
+    b_2 + \beta a^T a &= b_1\\
+    \beta &= \frac{b_1-b_2}{a^T a}\\
+    |\beta| &= \frac{|b_1-b_2|}{\norm{a}_2^2}\\
+  \end{align*}
+  
+\item 2.14(a) from textbook.\\
+  Expanded and restricted sets. Let $S \subseteq R^n$ , and let $\norm{\dot}$ be a norm on $R^n$.\\
+  (a) For $a \geq 0$ we define $S_a$ as $\{x : dist(x, S) \leq a\}$, where $dist(x, S) = \inf_{y\in S} \norm{x-y}$. We refer to $S_a$ as $S$ expanded or extended by $a$. Show that if $S$ is convex, then $S_a$ is convex.
+  \begin{align*}
+    S \text{ is convex} &\implies (\forall y_1, y_2) (\forall \theta \in [0,1]) \theta y_1 + (1-\theta) y_2 \in S, \text{substitute into }dist(x,S):\\
+    dist(x,S) &= \inf_{y_1,y_2 \in S} \norm{x-(\theta y_1 + (1-\theta) y_2)}\\
+    \text{let } x &= \theta x_1 + (1-\theta) x_2 \text{ with no assumptions}\\
+    dist(x,S) &= \inf_{y_1,y_2 \in S} \norm{\theta(x_1-y_1) + (1-\theta)(x_2-y_2)}\\
+    dist(x,S) &\leq \inf_{y_1\in S}\norm{\theta(x_1-y_1)} + \inf_{y_2 \in S}\norm{(1-\theta)(x_2-y_2)} \text{ via triangular inequality}\\
+                        &\leq |\theta| \inf_{y_1\in S}\norm{x_1-y_1} + |(1-\theta)|\inf_{y_2 \in S}\norm{x_2-y_2}\\
+    \text{suppose } x_1, x_2 & \in S_a \implies \inf_{y_1\in S}\norm{x_1-y_1} \leq a \wedge \inf_{y_2 \in S}\norm{x_2-y_2} \leq a \text{ to satisfy definition of }S_a,\ then:\\
+    dist(x,S) &\leq \theta a + (1-\theta)a=a\\
+    (\forall x_1, x_2 \in S_a) & \set{x= \theta x_1 + (1-\theta) x_2 : dist(x, S) \leq a} \implies x_1, x_2 \in S_a\ \square
+  \end{align*}
+  
+  \pagebreak
+  
+\item Problem 3.14 from textbook.\\
+  Convex-concave functions and saddle-points. We say the function $f: R^n \times R^m \to R$ is convex-concave if $f(x, z)$ is a concave function of $z$, for each fixed $x$, and a convex function of $x$, for each fixed $z$. We also require its domain to have the product form $dom f = A \times B$, where $A \subseteq R^n$ and $B \subseteq R^m$ are convex.\\
+  \begin{enumerate}
+  \item Give a second-order condition for a twice differentiable function $f : R^n \times R^m \to R$ to be convex-concave, in terms of its Hessian $\nabla^2 f(x, z)$.
+  \item Suppose that $f: R^n \times R^m \to R$ is convex-concave and differentiable, with $\nabla f(\tilde{x}, \tilde{z}) = 0$. Show that the saddle-point property holds: for all $x, z$, we have \[f(\tilde{x}, z) \leq f(\tilde{x}, \tilde{z}) \leq f(x, \tilde{z})\]
+    Show that this implies that $f$ satisfies the strong max-min property: \[\sup_z \inf_x f(x, z) = \inf_x \sup_z f(x, z)\] (and their common value is $f(\tilde{x}, \tilde{z})$).
+  \item Now suppose that $f: R^n \times R^m \to \R$ is differentiable, but not necessarily convexconcave, and the saddle-point property holds at $\tilde{x}, \tilde{z}$: \[f(\tilde{x}, z) \leq f(\tilde{x}, \tilde{z}) \leq  f(x, \tilde{z})\] for all $x, z$. Show that $\nabla f(\tilde{x}, \tilde{z}) = 0$.
+  \end{enumerate}
+\item Problem 3.16(a-c) from textbook.
+
+  For each of the following functions determine whether it is convex, concave, quasiconvex, or quasiconcave.\\
+  \begin{enumerate}
+  \item $f(x) = e^x - 1$ on $\R$
+  \item $f(x_1 , x_2 ) = x_1 x_2$ on $\R^2_{++}$
+  \item $f(x_1 , x_2 ) = 1/(x_1, x_2)$ on $\R^2_{++}$
+  \item $f(x_1 , x_2 ) = x_1 / x_2$ on $\R^2_{++}$
+  \item $f(x_1 , x_2 ) = x_1^2 / x_2$ on $\R \times \R_{++}$
+  \item $f(x_1 , x_2 ) = x_1^{\alpha} x_2^{1−\alpha},$ where $0 \leq \alpha \leq 1$, on $\R^2_{++}$
+  \end{enumerate}
+
+\item Problem 3.32(a) from textbook.\\
+  Products and ratios of convex functions. In general the product or ratio of two convex functions is not convex. However, there are some results that apply to functions on R. Prove the following.
+  \begin{enumerate}
+  \item If $f$ and $g$ are convex, both nondecreasing (or nonincreasing), and positive functions on an interval, then $fg$ is convex.
+  \end{enumerate}
+
+\item Consider the function $f(x, y) = x^2 + y^2 + \beta x y + x + 2y$. Find $(x^* , y^* )$ for which $\nabla f = 0$. Express your answer as a function of $\beta$. For which values of $\beta$ is the $(x^* , y^* )$ a global minimum of $f(x, y)$?
+\item A function $f(x)$ is strongly convex with a positive factor $m$ if $\nabla^2 f(x) \succeq mI$, for all $x$, where $I$ denotes the identity matrix. Another equivalent definition of a m-strongly convex function, with respect to $l_2$-norm $\norm{\cdot}_2$ , is given by $f (y) \geq f(x)+\nabla f (x)^T (y−x) + \frac{m}{2}\norm{y-x}_2^2$ for all $x, y$.
+  \begin{enumerate}
+  \item Assume f (x) is a strongly convex function with factor m. Is f (x) also a strictly convex function?
+  \item Assume g(x) is a strictly convex function. Is g(x) also a strongly convex function?
+    Find the largest factor of strong convexity.
+    Hint: You may assume that the eigen values of the hessian matrix, represented by $\lambda_1 \geq
+\lambda_2 \geq .. \geq \lambda_n$, are given and known. You may describe the largest strong convexity factor in terms of the eigen values of the hessian matrix.
+  \end{enumerate}
+\item In this problem, we are given a set of data points $(x_i, y_i ), i=1,..,100$. We wish to fit a quadratic model, $y_i = ax_i^2 + bx_i + c + n_i$, to the data. Here, $(a, b, c)$ are the parameters to be determined and $n_i$ is the unknown observation noise. The $(x_i, y_i)$ points are contained
+in a file hw1data.mat available on the course webpage. You may load the data to MATLAB
+using the command load hw1data and view them using scatter(x,y,'+'). Please use
+the same data set and find the maximum likelihood estimate of (a, b, c) assuming $n_i$'s are
+i.i.d., and
+\begin{enumerate}
+\item $n_i \sim \mathcal{N}(0, 1)$;
+\item $n_i$ is always positive and $n_i \sim e^{-z}$ for $z \geq 0$.
+\end{enumerate}
+
+\end{enumerate}
+
+\end {document}
