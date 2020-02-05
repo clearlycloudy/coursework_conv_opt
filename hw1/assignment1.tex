@@ -46,27 +46,36 @@
   %   \end{cases}
 
 \lhead{Convex Optimization - HW1}
-\rhead{(Bill) Yuan Liu, 996954078, 2020/01/29}
+\rhead{(Bill) Yuan Liu, 996954078, 2020/02/04}
 
 \begin{enumerate}
 \item Consider the function $f(x)=-\sum_i^m log(b_i-a_i^Tx)$. Compute $\nabla f$ and $\nabla^2 f$. Write down the first three terms of the Taylor series expansion of $f(x)$ around some $x_0$.\\
   \begin{align*}
     \ppartial{f}{x_j} &= -\sum_i^m \frac{1}{b_i-a_i^T x} \ppartial{(b_i-a_i^Tx)}{x_j}, j=1,..,n\\
-                      &= -\sum_i^m \frac{1}{b_i-a_i^T x} (-a_{ij})\\
-                      &= \sum_i^m \frac{a_{ij}}{b_i-a_i^T x}\\
+                      &= -\sum_i^m \frac{1}{b_i-a_i^T x} (-a_{ij}^T)\\
+                      &= \sum_i^m \frac{a_{ij}^T}{b_i-a_i^T x}\\
+    \ppartial{f}{x} &=  \begin{bmatrix} \ppartial{f}{x_1} \\ .. \\ \ppartial{f}{x_n} \end{bmatrix}
+    \\&\text{ where }a_{ij}^T \text{ is the scalar jth component of }a_i^T.\\
     \\
-    \ppartial{^2 f}{x_{jk}} &= \ppartial{\sum_i^m \frac{a_{ij}}{b_i-a_i^T x}}{x_k}, j=1,..,n, , k=1,..,n\\
-                      &= -\sum_i^m \frac{a_{ij}}{(b_i-a_i^T x)^2}\ppartial{(b_i-a_i^T x)}{x_k}\\
-                      &= \sum_i^m \frac{a_{ij}}{(b_i-a_i^T x)^2}(a_{ik})\\
-                      &= \sum_i^m \frac{a_{ij}a_{ik}}{(b_i-a_i^T x)^2}\\
+    \ppartial{^2 f}{x_{jk}} &= \ppartial{\sum_i^m \frac{a_{ij}^T}{b_i-a_i^T x}}{x_k}, j=1,..,n, , k=1,..,n\\
+                      &= -\sum_i^m \frac{a_{ij}^T}{(b_i-a_i^T x)^2}\ppartial{(b_i-a_i^T x)}{x_k}\\
+                      &= \sum_i^m \frac{a_{ij}^T}{(b_i-a_i^T x)^2}(a_{ik}^T)\\
+                      &= \sum_i^m \frac{a_{ij}^Ta_{ik}^T}{(b_i-a_i^T x)^2}\\
+    \ppartial{^2 f}{x} &= \begin{bmatrix} \ppartial{^2 f}{x_{1,1}} & .. \\
+      .. & \ppartial{^2 f}{x_{n,n}} \end{bmatrix}\\
+  \end{align*}
+
+  \pagebreak
+  
+  Taylor series:
+  \begin{align*}
     f(x) &= \sum_{i=0}^{\infty} \frac{f^i(x_0)(x-x_0)^i}{i!}\\
-                      &=f(x_0)+f^{(1)}(x_0)(x-x_0)+\frac{1}{2}f^{(2)}(x_0)(x-x_0)^2+o((x-a)^3)\\
-                      &=(-\sum_i^m log(b_i-a_i^Tx_0))_:+
-    (\sum_i^m \frac{a_{ij}}{b_i-a_i^T x})^T (x-x_0)+
-    \frac{1}{2} (x-x_0)^T (\sum_i^m \frac{a_{ij}a_{ik}}{(b_i-a_i^T x)^2})_{:,:} (x-x_0)\\
+                      &=f(x_0)+f^{(1)}(x_0)(x-x_0)+\frac{1}{2}f^{(2)}(x_0)(x-x_0)^2+O((x-a)^3)\\
+                      &=\bigg[-\sum_i^m log(b_i-a_i^Tx_0)\bigg]_{j=1:n} +
+                        \bigg[\sum_i^m \frac{a_{ij}^T}{b_i-a_i^T x}\bigg]_{j=1:n}^T (x-x_0)\\
+         & + \frac{1}{2} (x-x_0)^T \bigg[\sum_i^m \frac{a_{ij}a_{ik}}{(b_i-a_i^T x)^2}\bigg]_{j=1:n,k=1:n} (x-x_0)\\ & + O((x-x_0)^3)\\
     \\
   \end{align*}
-  
   \pagebreak
   
 \item 2.5 from textbook.\\
@@ -89,13 +98,13 @@
   \begin{align*}
     S \text{ is convex} &\implies (\forall y_1, y_2) (\forall \theta \in [0,1]) \theta y_1 + (1-\theta) y_2 \in S, \text{substitute into }dist(x,S):\\
     dist(x,S) &= \inf_{y_1,y_2 \in S} \norm{x-(\theta y_1 + (1-\theta) y_2)}\\
-    \text{let } x &= \theta x_1 + (1-\theta) x_2 \text{ with no assumptions}\\
+    \text{let } x &= \theta x_1 + (1-\theta) x_2\\
     dist(x,S) &= \inf_{y_1,y_2 \in S} \norm{\theta(x_1-y_1) + (1-\theta)(x_2-y_2)}\\
     dist(x,S) &\leq \inf_{y_1\in S}\norm{\theta(x_1-y_1)} + \inf_{y_2 \in S}\norm{(1-\theta)(x_2-y_2)} \text{ via triangular inequality}\\
                         &\leq |\theta| \inf_{y_1\in S}\norm{x_1-y_1} + |(1-\theta)|\inf_{y_2 \in S}\norm{x_2-y_2}\\
     \text{suppose } x_1, x_2 & \in S_a \implies \inf_{y_1\in S}\norm{x_1-y_1} \leq a \wedge \inf_{y_2 \in S}\norm{x_2-y_2} \leq a \text{ to satisfy definition of }S_a,\ then:\\
     dist(x,S) &\leq \theta a + (1-\theta)a=a\\
-    (\forall x_1, x_2 \in S_a) & \set{x= \theta x_1 + (1-\theta) x_2 : dist(x, S) \leq a} \implies x_1, x_2 \in S_a\ \square
+    (\forall \theta, x_1, x_2 \in S_a) & \implies (x=\theta x_1 + (1-\theta) x_2) \wedge dist(x, S) \leq a \\ & \implies  \theta x_1 + (1-\theta) x_2 \in S_a \implies S_a \text{ convex}
   \end{align*}
   
   \pagebreak
@@ -152,14 +161,14 @@
     
   \item Now suppose that $f: R^n \times R^m \to \R$ is differentiable, but not necessarily convexconcave, and the saddle-point property holds at $\tilde{x}, \tilde{z}$: \[f(\tilde{x}, z) \leq f(\tilde{x}, \tilde{z}) \leq  f(x, \tilde{z})\] for all $x, z$. Show that $\nabla f(\tilde{x}, \tilde{z}) = 0$.
 
-    Using 1st order conditions:
+    Using 1st order conditions: 
     \begin{align*}
       (\forall x)\ f(x,\tilde{z}) & \geq f(\tilde{x}, \tilde{z}) + \nabla f(\tilde{x},\tilde{z})\begin{bmatrix}x-\tilde{x}\\0\end{bmatrix}\\
       (\forall z)\ f(\tilde{x},z) & \leq f(\tilde{x}, \tilde{z}) + \nabla f(\tilde{x},\tilde{z})\begin{bmatrix}0\\z-\tilde{z}\end{bmatrix}\\
       (\forall x,z)\ f(\tilde{x},z) - \nabla f(\tilde{x},\tilde{z})\begin{bmatrix}0\\z-\tilde{z}\end{bmatrix} &\leq f(\tilde{x},\tilde{z}) \leq f(x,\tilde{z}) - \nabla f(\tilde{x},\tilde{z})\begin{bmatrix}x-\tilde{x}\\0\end{bmatrix}\\
-      (\forall x,z)\ f(\tilde{x},z) &\leq f(\tilde{x},\tilde{x}) \leq f(x,\tilde{z}), \implies\\
-      (\forall z)\ 0 &\leq \nabla f(\tilde{x},\tilde{z})\begin{bmatrix}0\\z-\tilde{z}\end{bmatrix}\\
-      (\forall x)\ 0 &\leq - \nabla f(\tilde{x},\tilde{z})\begin{bmatrix}x-\tilde{x}\\0\end{bmatrix}, \implies\\
+      (\forall x,z)\ f(\tilde{x},z) &\leq f(\tilde{x},\tilde{x}) \leq f(x,\tilde{z}) \implies\\
+      (\forall z)\ 0 &\leq \nabla f(\tilde{x},\tilde{z})\begin{bmatrix}0\\z-\tilde{z}\end{bmatrix},\\
+      (\forall x)\ 0 &\leq - \nabla f(\tilde{x},\tilde{z})\begin{bmatrix}x-\tilde{x}\\0\end{bmatrix} \implies\\
       \nabla f(\tilde{x},\tilde{z}) &= 0
     \end{align*}
     
@@ -309,14 +318,15 @@
   \pagebreak
 \item A function $f(x)$ is strongly convex with a positive factor $m$ if $\nabla^2 f(x) \succeq mI$, for all $x$, where $I$ denotes the identity matrix. Another equivalent definition of a m-strongly convex function, with respect to $l_2$-norm $\norm{\cdot}_2$ , is given by $f (y) \geq f(x)+\nabla f (x)^T (y−x) + \frac{m}{2}\norm{y-x}_2^2$ for all $x, y$.
   \begin{enumerate}
-  \item Assume f (x) is a strongly convex function with factor m. Is f (x) also a strictly convex function?
+  \item Assume $f(x)$ is a strongly convex function with factor m. Is $f(x)$ also a strictly convex function?
     \begin{align*}
-      &(\forall x)\ \nabla^2 f(x)-mI \succeq 0 \iff \nabla^2 f(x) -mI \text{ is SPD} \iff (\forall i) \lambda_i^'(\nabla^2 f(x) -mI) \geq 0\\
+      &\text{let }\lambda_i(A) \text{ denote ith sorted (descending) eigenvalue of }A\\
+      &(\forall x)\ \nabla^2 f(x)-mI \succeq 0 \iff \nabla^2 f(x) -mI \text{ is SPD} \iff (\forall i) \lambda_i(\nabla^2 f(x) -mI) \geq 0\\
       &mI \text{ is symmetric} \implies (\forall x) \nabla^2 f(x) \text{ is symmetric}\\
       &\text{eigenvalues of the orginal hessian:}\\
-      &(\forall x)\ (\forall i) \lambda_i(\nabla^2 f(x)) \geq \lambda_n^'(\nabla^2 f(x) -mI) + m \geq  0 + m = m\\
+      &(\forall x)\ (\forall i) \lambda_i(\nabla^2 f(x)) \geq \lambda_n(\nabla^2 f(x) -mI) + m \geq  0 + m = m\\
       &m>0 \implies (\forall x) (\forall i) \lambda_i(\nabla^2 f(x)) > 0\\
-      &(\forall x) \nabla^2 f(x) = \nabla^2 f(x)^T \wedge (\forall i) \lambda_i(\nabla^2 f(x)) > 0 \implies (\forall x)\nabla^2 f(x) \succ 0 \implies f \text{ strictly convex}
+      &(\forall x) \nabla^2 f(x) \text{ symmetric } \wedge (\forall i) \lambda_i(\nabla^2 f(x)) > 0 \implies (\forall x)\nabla^2 f(x) \succ 0 \implies f \text{ strictly convex}
     \end{align*}
   \item Assume g(x) is a strictly convex function. Is g(x) also a strongly convex function?
     Find the largest factor of strong convexity.
@@ -328,17 +338,16 @@
       \\
       &g(x) \text{ strictly convex} \notimplies (\forall x) \nabla^2 g(x) \succ 0 (\text{ eg: } f(x) = x^4, \nabla^2f(x)|_{x=0} \not\succ 0 )\\
       \\
-      &\text{case for } \nabla^2 g(x)\ not\ PD:\\
+      &\text{case for } \nabla^2 g(x)\ not\ PD \text{ for all x}:\\
       &(\forall x) \nabla^2 g(x) \not\succ 0 \implies (\exists x)(\exists i)\lambda_i(\nabla^2 g(x)) = \lambda_n(\nabla^2 g(x))\leq 0\\
-      &(\exists x)(\exists i)\lambda_i(\nabla^2 g(x) -mI) \geq \lambda_n(\nabla^2 g(x)) - m < 0\\
-      &m > 0 \wedge \lambda_n(\nabla^2 g(x)) \leq 0 \implies (\exists x)(\exists i)\lambda_i(\nabla^2 g(x) -mI) < 0 \implies (\forall x) \nabla^2 g(x) -mI \not \succeq 0\\
-      &\implies g(x) \text{ not strongly convex}\\
+      &m > 0 \implies (\exists x) \lambda_n(\nabla^2 g(x)) - m < 0 \implies (\exists x)(\exists i)\lambda_i(\nabla^2 g(x) -mI) < 0 \implies\\
+      & (\forall x) \nabla^2 g(x) -mI \not \succeq 0 \implies g(x) \text{ not strongly convex}\\
       \\
-      &\text{case for } \nabla^2 g(x)\ PD:\\
+      &\text{case for } \nabla^2 g(x)\ PD \text{ for all x}:\\
       &(\forall x) \nabla^2 g(x) \succ 0 \implies (\forall x)(\forall i)\lambda_i(\nabla^2 g(x)) \geq \lambda_n(\nabla^2 g(x)) > 0\\
       &(\forall x)(\forall i)\lambda_i(\nabla^2 g(x) -mI) \geq \lambda_n(\nabla^2 g(x)) - m, m >0, \lambda_n(\nabla^2 g(x))>0\\
-      &\text{let }m \leq \lambda_n(\nabla^2 g(x)) \implies (\forall x)(\forall i)\lambda_i(\nabla^2 g(x) -mI) \geq 0\\
-      &\implies (\forall x) \nabla^2 g(x) -mI \succeq 0 \implies g(x) \text{ strongly convex}\\
+      &\text{let }m \leq \lambda_n(\nabla^2 g(x)) \implies (\forall x)(\forall i)\lambda_i(\nabla^2 g(x) -mI) \geq 0 \implies\\
+      &(\forall x) \nabla^2 g(x) -mI \succeq 0 \implies g(x) \text{ strongly convex}\\
       &\text{largest strong convexity factor: } m = \lambda_n(\nabla^2 g(x))
     \end{align*}
   \end{enumerate}
@@ -360,11 +369,14 @@ i.i.d., and
     l &= \sum_i log (\frac{1}{(2 \pi \sigma^2)^{0.5}} exp(\frac{-z_i^2}{2\sigma^2}))\\
     l &= \sum_i -\frac{1}{2} log(2 \pi \sigma^2) + \frac{-z_i^2}{2\sigma^2}\\
     % \sigma^2 & = 1\\
-    l &= \sum_i -\frac{1}{2} log(2 \pi) + \frac{-z_i^2}{2\sigma^2}\\
+    % l &= \sum_i -\frac{1}{2} log(2 \pi) + \frac{-z_i^2}{2\sigma^2}\\
+    \frac{\partial z_i}{\partial a} &= -x_i^2\\
+    \frac{\partial z_i}{\partial b} &= x_i\\
+    \frac{\partial z_i}{\partial c} &= -1\\
     \frac{\partial l}{\partial a} &= \sum_i -\frac{1}{\sigma^2}z_i(-x_i^2)=0\\
     \frac{\partial l}{\partial b} &= \sum_i -\frac{1}{\sigma^2}z_i(-x_i)=0\\
     \frac{\partial l}{\partial c} &= \sum_i -\frac{1}{\sigma^2}z_i(-1)=0\\
-    \text{expand and rearrange: }\\
+    \text{expand } z_i \text{ and rearrange: }\\
     \begin{bmatrix}
       \sum_i x_i^4 & \sum_i x_i^3 & \sum_ix_i^2\\
       \sum_i x_i^2 & \sum_i x_i & \sum_i1\\
@@ -379,7 +391,7 @@ i.i.d., and
       \sum_i y_i\\
       \sum_i y_i x_i
     \end{bmatrix}\\
-    \text{solve: }\\
+    \text{solve linear system: }\\
     \begin{bmatrix}
       a \\ b \\ c
     \end{bmatrix}
@@ -404,11 +416,11 @@ i.i.d., and
   \begin{align*}
     l &= log \Pi_i p(z_i), z_i \geq 0\\
     l &= log \Pi_i exp(-z_i)\\
-    l &= \sum_i log exp(-z_i)\\
+    l &= \sum_i log\ exp(-z_i)\\
     l &= \sum_i -z_i\\
       &\max_{a,b,c} l = \min_{a,b,c} -l = \sum_i z_i,\ s.t.\ z_i \geq 0\\
       &\text{linear programming formulation:}\\
-    &\min -l = \min
+    &minimize
     \begin{bmatrix}
       -\sum_i x_i^2 & -\sum_i x_i & -length(x)
     \end{bmatrix}
