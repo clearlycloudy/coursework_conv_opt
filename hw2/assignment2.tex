@@ -1,0 +1,100 @@
+\documentclass[12pt,letter]{article}
+
+%% \usepackage[fleqn]{amsmath}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amsfonts,amsthm,bm}
+\usepackage{breqn}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{tikz}
+\usepackage{algorithm2e}
+\usepackage{siunitx}
+\usepackage{graphicx}
+\usepackage{subcaption}
+%% \usepackage{datetime}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{mathrsfs}
+\usepackage{fancyhdr}
+\usepackage{fancyvrb}
+\usepackage{parskip} %turns off paragraph indent
+\usepackage{float}
+
+\pagestyle{fancy}
+
+\usetikzlibrary{arrows}
+
+\DeclareMathOperator*{\argmin}{argmin}
+\newcommand*{\argminl}{\argmin\limits}
+
+\newcommand{\mathleft}{\@fleqntrue\@mathmargin0pt}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\ppartial}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\norm}[1]{\|#1\|}
+\newcommand{\set}[1]{\{#1\}}
+\newcommand{\notimplies}{\;\not\!\!\!\implies}
+
+\setcounter{MaxMatrixCols}{20}
+
+\begin {document}
+
+  % \begin{cases}
+  %     0, & \text{if}\ a=1 \\
+  %     1, & \text{otherwise}
+  %   \end{cases}
+
+\lhead{Convex Optimization - HW2}
+\rhead{(Bill) Yuan Liu, 996954078, 2020/02/22}
+
+\begin{enumerate}
+  
+\item Q 4.11(a,c,e) textbook
+  
+\item Q 4.16 textbook
+  
+\item Q 4.21(a) textbook
+  
+\item Q 4.25 textbook
+  
+  \begin{align*}
+    \varepsilon_i = \set{P_i u + q_i: \norm{u}_2 \leq 1}, i=1,..,K+L, P_i \in S^n
+  \end{align*}
+
+  Find a feasible hyperplane strictly separating $\varepsilon_1,..,\varepsilon_K$ from $\varepsilon_{K+1},..,\varepsilon_{K+L}$.
+  \begin{align*}
+    a^Tx+b > 0, x \in \bigcup_{i=1}^K \varepsilon_i\\
+    a^Tx+b < 0, x \in \bigcup_{i=K+1}^{K+L} \varepsilon_i\\
+    \text{let } \epsilon > 0 \text{, a constant for strict separation}\\
+    \text{relax inequalities to:}\\
+    a^Tx+b \leq -\epsilon, x \in \bigcup_{i=1}^K \varepsilon_i\\
+    a^Tx+b \geq \epsilon, x \in \bigcup_{i=K+1}^{K+L} \varepsilon_i\\
+    a^T(P_iu+q_i)+b \leq -\epsilon, \norm{u}_2 \leq 1, i=[1,K]\\
+    a^T(P_iu+q_i)+b \geq \epsilon, \norm{u}_2 \leq 1, i=[K+1,K+L]\\
+    \sup_{\norm{u}_2 \leq 1} a^TP_iu + a^Tq_i + b \leq -\epsilon, i=[1,K]\\
+    \sup_{\norm{u}_2 \leq 1} a^TP_iu = \frac{a^TP_i (a^TP_i)^T}{\norm{a^TP_i}_2} = \norm{a^TP_i}_2\\
+    \norm{a^TP_i}_2 + a^Tq_i + b \leq -\epsilon, i=[1,K]\\
+    \norm{a^TP_i}_2 \leq -a^Tq_i - b  -\epsilon, i=[1,K]\\
+    \inf_{\norm{u}_2 \leq 1} a^TP_iu + a^Tq_i + b \geq \epsilon, i=[K+1,K+L]\\
+    \inf_{\norm{u}_2 \leq 1} a^TP_iu = \frac{a^TP_i (-a^TP_i)^T}{\norm{a^TP_i}_2} = -\norm{a^TP_i}_2\\
+    -\norm{a^TP_i}_2 + a^Tq_i + b \geq \epsilon, i=[K+1,K+L]\\
+    \norm{a^TP_i}_2 \leq a^Tq_i + b -\epsilon, i=[K+1,K+L]\\
+  \end{align*}
+  Second order cone formulation:
+  \begin{align*}
+    &\min_{a,b} 0\\
+    &\norm{a^TP_i}_2 \leq -a^Tq_i - b  -\epsilon, i=[1,K]\\
+    &\norm{a^TP_i}_2 \leq a^Tq_i + b -\epsilon, i=[K+1,K+L]\\
+    &\text{where } \epsilon > 0
+  \end{align*}
+
+  \pagebreak
+  
+\item Q 4.30 textbook
+\item Q 4.43(a-b) textbook
+  
+\end{enumerate}
+
+
+\end {document}
