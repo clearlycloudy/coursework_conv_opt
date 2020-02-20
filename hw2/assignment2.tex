@@ -291,7 +291,58 @@
     \end{align*}
   \end{itemize}
 \item reserved
-\item reserved
+  
+  \pagebreak
+  
+\item Portfolio Design\\
+  \begin{align*}
+    E[x^Tp] &=  \bar{x} p\\
+    E[(x^Tp-\bar{x}^Tp)(x^Tp-\bar{x}^Tp)^T] &=  E[(p^T(x-\bar{x})(p^T(x-\bar{x})^T]\\
+            &=  p^TE[(x-\bar{x})(x-\bar{x})^T]p\\
+            &=  p^T\Sigma p\\
+  \end{align*}
+  Quadratic Programming formulation:\\
+  \begin{align*}
+    \min_p p^T \Sigma p,\ subject\ to:\\
+    1^T p = 1\\
+    -x^Tp \leq -r\\
+    Diag(1_{4 \times 1}) p \leq 1\\
+    -Diag(1_{4 \times 1}) p \leq 0
+  \end{align*}
+  
+  Solving for a range of $r$ yields:
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=13cm]{q8/q8_part_a.png}
+  \end{figure}
+  
+  \pagebreak
+  Portfolio for a range of $r$:
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=14cm]{q8/q8_part_b.png}
+  \end{figure}  
+  Solver:
+\begin{verbatim}
+function [rs, s] = solve()
+    x = [1.1, 1.35, 1.25, 1.05];
+    H = [ 0.2 -0.2 -0.12 0.02;...
+          -0.2 1.4 0.02 0.0;...
+          -0.12 0.02 1 -0.4;...
+           0.02 0 -0.4 0.2];
+
+    Aeq = ones(1,4);
+    beq = 1;
+    A = -x;
+    rs = 0.5:0.01:1.35
+    lb = zeros(4,1);
+    ub = ones(4,1);
+    s = arrayfun(@(b) quadprog(H,[],A,-b,Aeq,beq,lb,ub),rs, 'UniformOutput',false); 
+end
+\end{verbatim}
+  
+  \pagebreak
+  
 \item Optimal Control of a Unit Mass
   \begin{itemize}
   \item a) given:
@@ -344,8 +395,19 @@
       \includegraphics[width=11cm]{q9/part_a_plot_3.png}
     \end{figure}
 
-    Optimal strategy in this case is to apply a smooth symmetrical force around t = 5, so that velocity is always non-negative and displacement is always towards the destination.
-    
+    Optimal strategy in this case is to apply a smooth symmetrical force around t = 5, so that velocity is always non-negative and displacement is always towards the destination.\\
+
+    Solver:
+\begin{verbatim}
+H = diag(ones(10,1))
+f = []
+A = []
+b = []
+Aeq = [ones(1,10); 10:-1:1]
+beq = [0;1]
+f = quadprog(H,f,A,b,Aeq,beq)
+\end{verbatim}
+
     \pagebreak
     
   \item b) additional constraint: $x(5) = 0$\\
@@ -375,7 +437,19 @@
       \centering
       \includegraphics[width=11cm]{q9/part_b_plot_3.png}
     \end{figure}
-    Optimial strategy in this case is to reverse direction and then go forward again to gain enough velocity timed so that the displacement at t=5 is 0.
+    Optimial strategy in this case is to reverse direction and then go forward again to gain enough velocity timed so that the displacement at t=5 is 0.\\
+    
+    Solver:
+\begin{verbatim}
+H = diag(ones(10,1))
+f = []
+A = []
+b = []
+Aeq = [ones(1,10); 10:-1:1; 5 4 3 2 1 0 0 0 0 0]
+beq = [0;1;0]
+f = quadprog(H,f,A,b,Aeq,beq)
+\end{verbatim}
+
   \end{itemize}
 \end{enumerate}
 
