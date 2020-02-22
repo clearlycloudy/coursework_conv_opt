@@ -509,18 +509,14 @@ title('displacement vs t')
       \centering
       \includegraphics[width=11cm]{q9/part_b_plot_3.png}
     \end{figure}
-    Optimial strategy in this case is to reverse direction and then go forward again to gain enough velocity timed so that the displacement at t=5 is 0.\\
-    
+    Optimial strategy in this case is to reverse direction and then go forward again to gain enough velocity timed so that the displacement at t=5 is 0.\\    
     Solver:
 \begin{verbatim}
-H = diag(ones(10,1))
-f = []
-A = []
-b = []
-Aeq = [ones(1,10); 10:-1:1; 5 4 3 2 1 0 0 0 0 0]
-beq = [0;1;0]
-f = quadprog(H,f,A,b,Aeq,beq)
-
+H = diag(ones(10,1));
+f = []; A = []; b = [];
+Aeq = [ones(1,10); 10:-1:1; 5 4 3 2 1 0 0 0 0 0];
+beq = [0;1;0];
+f = quadprog(H,f,A,b,Aeq,beq);
 plot(1:10,f)
 title('force vs t')
 v = zeros(11,1)
@@ -529,7 +525,6 @@ for i=2:1:11
 end
 plot(0:1:10,v)
 title('velocity vs t')
-
 x = zeros(11,1)
 for i=1:1:11
     if i > 1
@@ -543,6 +538,135 @@ title('displacement vs t')
 \end{verbatim}
 
   \end{itemize}
+
+  \pagebreak
+  
+\item Least-Square Deconvolution\\
+  
+  
+  \begin{itemize}
+  \item a) Find the deconvolution filter, g of size m, and the best D for the given impulse response, h, of the channel.\\
+
+    A convolution matrix is constructed for use in QP. Constraints are also made for the convolution value $conv(g,h)[t=D]=1$ and filter to allow non-zero only in the appropriate indices in the system of equations. Then D is allowed to change and we collect feasible solutions for the filter and take the best one based on the lowest loss of the objective.\\
+
+    Assume 1-indexing as in Matlab
+    \begin{align*}
+      &\text{given: } D\\
+      X &=
+      \begin{bmatrix}
+        0_{n\times 1}\\ g_{m-1} \\ .. \\ g_{0}\\0_{n \times 1}
+      \end{bmatrix}\\
+      t_0 &= size(A,1)-1 \text{ //this row index corresponds to } conv(g,h)[0]\\
+      A &=
+      \begin{bmatrix}
+        h_0 & .. & h_{n-1} & 0_{1 \times (m+n)} & \\
+        0 & h_0 & .. & h_{n-1} & 0_{1 \times (m+n-1)} \\
+        .. & & & &\\
+        & 0_{1\times (m+n)} & h_0 & .. & h_{n-1}\\
+      \end{bmatrix}\\
+      A_2 &= A\\
+      A_2(t_0+D,:) &= 0\\
+      H &= A_2^T A_2\\
+      X_i &=0, \forall i \in \{1,..,n\} \cup \{n+m+1,..,2n+m\}\\
+      A_{eq}&=A(t_0+D,:)
+    \end{align*}
+    QP formulation for a given D:
+    \begin{align*}
+      \min_X & X^T H X,\ subject\ to:\\
+      A_{eq}X&=1\\
+      X_i &=0, \forall i \in \{1,..,n\} \cup \{n+m+1,..,2n+m\}
+    \end{align*}
+    Vary D in range $[-(m+n-1),1]$ and and solve QP to find best $g$ using lowest $X^THX$.\\
+
+    \pagebreak
+    Solver:
+\begin{verbatim}
+n = length(h);
+m = 20;
+
+% setup convolution matrix
+e = zeros(m+2*n,n);
+for i=1:10
+    e(:,i) = ones(m+2*n,1) * h(i);    
+end
+A = full(spdiags(e, 0:9, m+n+1, m+2*n));
+
+% row index for conv(f,g)[t=0]
+t_0 = size(A,1)-1;
+
+gs = []; losses = []; ds = [];
+% solve for different D offset from t_0 using QP
+for D=-(m+n-1):1
+    fprintf('d: %d\n',-D);
+    A2 = [ A(1:t_0+D-1,:);
+           zeros(1,m+2*n);
+           A(t_0+D+1:end,:) ];
+    H = A2'*A2;
+    Aeq = A(t_0+D,:);
+    beq = 1;
+    lb = [zeros(n,1); ones(m,1) * -Inf; zeros(n,1)];
+    ub = [zeros(n,1); ones(m,1) * Inf; zeros(n,1)];
+    X = quadprog(H,[],[],[],Aeq,beq,lb,ub);
+    if length(X) ~= 0 % guard for feasible answer
+        g = flip(X(n+1:n+1+m-1)); % flip to get [g_0, ..]
+        loss = X'*H*X;
+        losses = [ losses; loss];
+        gs = [gs; g'];
+        ds = [ds; -D];
+    end
+end
+
+% obtain the best answer for g
+[~,idx] = sort(losses(:,1));
+losses_sorted = losses(idx,:);
+gs_sorted = gs(idx,:);
+ds_sorted = ds(idx,:);
+g_best = gs_sorted(1,:);
+d_best = ds_sorted(1,:);
+fprintf("D best: %d\n", d_best);
+
+temp = conv(g_best,h);
+assert(abs(temp(d_best+1)-1.0)<1e-15);
+stem([0:length(temp)-1], temp);
+title('conv(g,h)');
+
+% verify on arbitrary data
+samples = rand(10000,1);
+output = conv(g_best, conv(h, samples));
+[r,lags] = xcorr(samples,output);
+[~,i]=max(r);
+l = -lags(i);
+assert(l==d_best);
+\end{verbatim}
+  Optimal parameters: D=8, $g$ plotted below:
+  \begin{figure}[H]
+    \centering
+    \includegraphics[]{q10/deconvolution_filter.png}
+  \end{figure}
+
+  \pagebreak
+  
+  \item b) Plot histogram of y (channel output) and z (filtered signal)\\
+
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=12cm]{q10/part_b_hist_y.png}
+  \end{figure}
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=12cm]{q10/part_b_hist_z.png}
+  \end{figure}
+  We have recovered the original signal. The output distribution is reasonable in that it has binary modes which is what we expect from given knowledge of the original signal input format.
+
+% \begin{verbatim}
+% hist(y);
+% title('histogram of y');
+% z=conv(y,g_best,'same');
+% hist(z);
+% title('histogram of conv(y,g)');
+% \end{verbatim}
+  \end{itemize}
+  
 \end{enumerate}
 
 
