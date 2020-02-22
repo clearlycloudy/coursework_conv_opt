@@ -103,7 +103,7 @@
       A_{i,:}x -  t_i \leq + b_i, \forall i\\
       -A_{i,:}x - t_i \leq - b_i, \forall i\\
     \end{align*}
-
+\pagebreak
 \item Q 4.16 textbook
   \begin{align*}
     x(t) \in \R^n, t \in \{0,..,N\}\\
@@ -122,15 +122,11 @@
       2|a| - 1, & |a| > 1\\
     \end{cases}\\
   \end{align*}
-  
-  \pagebreak
-  
   expanding\ $x(t)$:\\
   \begin{align*}
     x(0)&=0\\
     x(1)&=Ax(0)+bu(0) = bu(0)\\
     x(2)&=Ax(1)+bu(1)=A(bu(0))+bu(1)\\
-    x(3)&=Ax(2)+bu(2)=A(A(bu(0))+bu(1))+bu(2)\\
     x(i)&=A^{i-1}bu(0) + A^{i-2}bu(1) + ... + A^0 bu(i-1)=\sum_{j=0}^{i-1} A^{j}bu(i-1-j)\\
     x(i)&=
     \begin{bmatrix}
@@ -154,6 +150,7 @@
     v_t &\geq 2u_t-1\\
     v_t &\geq -2u_t-1
   \end{align*}
+  
   LP formulation:
   \begin{align*}
     v_{0,..,N-1},u_{0,..,N-1} \in \R^N\\
@@ -167,17 +164,13 @@
     \end{bmatrix}
     \begin{bmatrix}
       u_{0} \\ .. \\ u_{N-1}
-    \end{bmatrix} & = x_{des}\\
+    \end{bmatrix} & = x_{des}
   \end{align*}
-  
-  \pagebreak
-  
 \item Q 4.21(a) textbook\\
   Find explicit solution for the QCQP:\\
   minimize $c^T x$, subject to:\\
   $x^TAx \leq 1$\\
   $A \in S^n_{++}, c \neq 0$\\
-
   \begin{align*}
     x^TAx & = x^TA^{1/2}A^{1/2}x = (A^{1/2}x)^T A^{1/2}x = \norm{A^{1/2}x}_2^2\\
     \norm{A^{1/2}x}_2^2 & \leq 1\\
@@ -199,11 +192,9 @@
   \pagebreak
   
 \item Q 4.25 textbook
-  
   \begin{align*}
     \varepsilon_i = \set{P_i u + q_i: \norm{u}_2 \leq 1}, i=1,..,K+L, P_i \in S^n
   \end{align*}
-
   Find a feasible hyperplane strictly separating $\varepsilon_1,..,\varepsilon_K$ from $\varepsilon_{K+1},..,\varepsilon_{K+L}$.
   \begin{align*}
     a^Tx+b &> 0, x \in \bigcup_{i=1}^K \varepsilon_i\\
@@ -222,53 +213,48 @@
     \inf_{\norm{u}_2 \leq 1} a^TP_iu + a^Tq_i + b &\geq \epsilon, i=\{K+1,..,K+L\}\\
     \inf_{\norm{u}_2 \leq 1} a^TP_iu &= \frac{a^TP_i (-a^TP_i)^T}{\norm{a^TP_i}_2} = -\norm{a^TP_i}_2\\
     -\norm{a^TP_i}_2 + a^Tq_i + b &\geq \epsilon, i=\{K+1,..,K+L\}\\
-    \norm{a^TP_i}_2 &\leq a^Tq_i + b -\epsilon, i=\{K+1,..,K+L\}\\
+    \norm{a^TP_i}_2 &\leq a^Tq_i + b -\epsilon, i=\{K+1,..,K+L\}
   \end{align*}
-  
   Second Order Cone Programming formulation:
   \begin{align*}
     &\min_{a,b}\ 0\\
-    &\norm{a^TP_i}_2 \leq -a^Tq_i - b  -\epsilon, i\in\{1,..,K\}\\
-    &\norm{a^TP_i}_2 \leq a^Tq_i + b -\epsilon, i\in\{K+1,..,K+L\}\\
+    &\norm{a^TP_i}_2 \leq -q_i^Ta - b  -\epsilon, i\in\{1,..,K\}\\
+    &\norm{a^TP_i}_2 \leq q_i^Ta + b -\epsilon, i\in\{K+1,..,K+L\}\\
     &\text{where } \epsilon > 0
   \end{align*}
 
 \item Q 4.30 textbook\\
-  Express as Geometric Programming:\\
+  Express as Geometric Programming:
   \begin{align*}
     T & \in [T_{min}, T_{max}], T_{min},T_{max} > 0 \\
     r & \in [r_{min}, r_{max}], r_{min},r_{max} > 0\\
     w & \in [w_{min}, w_{max}], w_{min},w_{max} > 0\\
     w & \leq 0.1 r\\
-    T &> 0 \\
-    r &> 0 \\
-    w &> 0\\
-    \max\ &\alpha_4 T r^2\\
-    \alpha_1 \frac{T r}{w} + \alpha_2 r + \alpha_3 r w & \leq c_{max}\\
+    T &> 0, r > 0, w > 0, c_{max} > 0\\
+    \max\ &\alpha_4 T r^2,\ subject\ to:\\
+    \alpha_1 \frac{T r}{w} & + \alpha_2 r + \alpha_3 r w \leq c_{max}\\
     \alpha_i &> 0, \forall i\\
-  \end{align*}
-  \begin{align*}
-    \max\ \alpha_4 T r^2=\min\ \frac{1}{\alpha_4 T r^2} = \min\ \frac{1}{\alpha_4} T^{-1} r^{-2}\\
-    \frac{\alpha_1}{c_{max}} T rw^{-1} + \frac{\alpha_2}{c_{max}} r + \frac{\alpha_3}{c_{max}} r w & \leq 1\\
-    T \leq T_{max} \iff \frac{T}{T_{max}} \leq 1\\
-    T \geq T_{min} \iff \frac{T_{min}}{T} \leq 1\\
-    r \leq r_{max} \iff \frac{r}{r_{max}} \leq 1\\
-    r \geq r_{min} \iff \frac{r_{min}}{r} \leq 1\\
-    w \leq w_{max} \iff \frac{w}{w_{max}} \leq 1\\
-    w \geq w_{min} \iff \frac{w_{min}}{w} \leq 1\\
-    w \leq 0.1 r \iff \frac{10w}{r} \leq 1 \\    
+    \max\ \alpha_4 T r^2&=\min\ \frac{1}{\alpha_4 T r^2} = \min\ \frac{1}{\alpha_4} T^{-1} r^{-2}\\
+    \frac{\alpha_1}{c_{max}} T rw^{-1} & + \frac{\alpha_2}{c_{max}} r + \frac{\alpha_3}{c_{max}} r w \leq 1\\
+    T \leq T_{max} &\iff \frac{T}{T_{max}} \leq 1\\
+    T \geq T_{min} &\iff \frac{T_{min}}{T} \leq 1\\
+    r \leq r_{max} &\iff \frac{r}{r_{max}} \leq 1\\
+    r \geq r_{min} &\iff \frac{r_{min}}{r} \leq 1\\
+    w \leq w_{max} &\iff \frac{w}{w_{max}} \leq 1\\
+    w \geq w_{min} &\iff \frac{w_{min}}{w} \leq 1\\
+    w \leq 0.1 r &\iff \frac{10w}{r} \leq 1
   \end{align*}
   GP formulation:
   \begin{align*}
-    \min_{T,r,w}\ \frac{1}{\alpha_4} T^{-1} r^{-2}, subject\ to:\\
-    \frac{T}{T_{max}} \leq 1, \frac{T_{min}}{T} \leq 1\\
-    \frac{r}{r_{max}} \leq 1, \frac{r_{min}}{r} \leq 1\\
-    \frac{w}{w_{max}} \leq 1, \frac{w_{min}}{w} \leq 1\\
-    \frac{10w}{r} \leq 1 \\
-    \frac{\alpha_1}{c_{max}} T rw^{-1} + \frac{\alpha_2}{c_{max}} r + \frac{\alpha_3}{c_{max}} r w \leq 1\\
-    given:\\
-    \alpha_1,\alpha_2,\alpha_3,\alpha_4 > 0\\
-    T_{min}, T_{max}, r_{min}, r_{max}, w_{min}, w_{max} > 0\\
+    &\min_{T,r,w}\ \frac{1}{\alpha_4} T^{-1} r^{-2}, subject\ to:\\
+    &\frac{T}{T_{max}} \leq 1, \frac{T_{min}}{T} \leq 1\\
+    &\frac{r}{r_{max}} \leq 1, \frac{r_{min}}{r} \leq 1\\
+    &\frac{w}{w_{max}} \leq 1, \frac{w_{min}}{w} \leq 1\\
+    &\frac{10w}{r} \leq 1 \\
+    &\frac{\alpha_1}{c_{max}} T rw^{-1} + \frac{\alpha_2}{c_{max}} r + \frac{\alpha_3}{c_{max}} r w \leq 1\\
+    % given:\\
+    % \alpha_1,\alpha_2,\alpha_3,\alpha_4 > 0\\
+    % T_{min}, T_{max}, r_{min}, r_{max}, w_{min}, w_{max} > 0\\
   \end{align*}
 \item Q 4.43(a-b) textbook\\
   $A:R^n \to S^m, A(x) = A_0 + x_1A_1 + .. + x_n A_n$\\
@@ -287,10 +273,36 @@
       \min_{t,x,a,b} t,\ & subject\ to:\\
       A(x) & \leq_{S_+^m} bI \\
       A(x) & \geq_{S_+^m} aI \\
-      t - b + a & = 0
+      t - b & + a = 0
     \end{align*}
   \end{itemize}
-\item reserved
+
+  \pagebreak
+  
+\item Formulate $\min_{x\in\R^n, z \in \R} \sum_{m=1}^M max(a_m^Tx, z) + \tau \norm{x}_2^2$ as LP/QP/SOCP/SDP.\\
+  \begin{align*}
+    let\ t_m = max(a_m^Tx, z)\\
+    \min_{x\in\R^n, z \in \R, t\in\R^m} 1_{m\times 1}^T t_m + \tau \norm{x}_2^2,\ subject\ to:\\
+    a_m^Tx \leq t_m, \forall m\\
+    z \leq t_m, \forall m
+  \end{align*}
+  Quadratic Programming formulation:
+  \begin{align*}
+    &X\in\R^{m+n+1} =\begin{bmatrix}t_{1:m},\ x_{1:n},\ z\end{bmatrix}\\
+    &\min_{X}
+    X^T \begin{bmatrix}
+      & 0_{m \times (m+n+1)} &\\
+      0_{n\times m} & \tau I_{n\times n} & 0_{n\times 1}\\
+      & 0_{m \times (m+n+1)} &
+    \end{bmatrix} X +
+    \begin{bmatrix}
+      1_{1\times m}\ 0_{1\times (n+1)}
+    \end{bmatrix}X,\ subject\ to:\\
+    &\begin{bmatrix}
+      -I_{m \times m} & A & 0_{m \times 1}\\
+      -I_{m \times m} & 0_{m \times 5} & 1_{m \times 1}
+    \end{bmatrix} X \leq 0_{2m \times 1}, A =\begin{bmatrix}a_1^T\\..\\a_m^T\\\end{bmatrix}
+  \end{align*}
   
   \pagebreak
   
@@ -337,8 +349,44 @@ function [rs, s] = solve()
     rs = 0.5:0.01:1.35
     lb = zeros(4,1);
     ub = ones(4,1);
-    s = arrayfun(@(b) quadprog(H,[],A,-b,Aeq,beq,lb,ub),rs, 'UniformOutput',false); 
+    s = arrayfun(@(b) quadprog(H,[],A,-b,Aeq,beq,lb,ub),rs,...
+        'UniformOutput',false); 
 end
+
+
+[rs, ret] = solve();
+
+ps = cell2mat(ret)';
+x = [1.1, 1.35, 1.25, 1.05]'; 
+H = [ 0.2 -0.2 -0.12 0.02;...
+      -0.2 1.4 0.02 0.0;...
+      -0.12 0.02 1 -0.4;...
+       0.02 0 -0.4 0.2];
+ms = ps * x;
+vs = diag(ps * H * ps');
+
+plot(rs,ms);
+hold on;
+plot(rs,vs);
+title('return expectaion and variance vs. min expected return');
+legend('expectation','variance');
+xlabel('min. expected return');
+ylabel('return value');
+hold off;
+
+%% additional plot for part b
+plot(rs,ms);
+hold on;
+plot(rs,vs);
+title('return expectaion and variance / portfolio fraction vs. min expected return');
+xlabel('min. expected return');
+ylabel('return value / portolio fraction');
+plot(rs,ps(:,1));
+plot(rs,ps(:,2));
+plot(rs,ps(:,3));
+plot(rs,ps(:,4));
+legend('expectation','variance', 'IBM', 'Google', 'Apple', 'Intel');
+hold off;
 \end{verbatim}
   
   \pagebreak
@@ -376,7 +424,7 @@ end
       \begin{bmatrix}
         & & 1^T & & \\
         10 & 9 & .. & 2 & 1
-      \end{bmatrix} p &=
+      \end{bmatrix} f &=
       \begin{bmatrix}
         0\\
         1
@@ -406,6 +454,30 @@ b = []
 Aeq = [ones(1,10); 10:-1:1]
 beq = [0;1]
 f = quadprog(H,f,A,b,Aeq,beq)
+
+plot(1:10,f)
+title('force vs t')
+
+v = zeros(11,1)
+for i=2:1:11
+    v(i) = v(i-1) + f(i-1)
+end
+
+plot(0:1:10,v)
+title('velocity vs t')
+
+x = zeros(11,1)
+for i=1:1:11
+    if i > 1
+        x(i) = x(i-1) + v(i)
+    else
+        x(i) = v(i)
+    end
+end
+
+plot(0:1:10,x)
+title('displacement vs t')
+
 \end{verbatim}
 
     \pagebreak
@@ -417,7 +489,7 @@ f = quadprog(H,f,A,b,Aeq,beq)
         & & & 1^T & & & &\\
         10 & 9 & .. &&& & 2 & 1\\
         5 & 4 & 3 & 2 & 1 & 0 & .. & 0
-      \end{bmatrix} p &=
+      \end{bmatrix} f &=
       \begin{bmatrix}
         0\\
         1\\
@@ -448,6 +520,26 @@ b = []
 Aeq = [ones(1,10); 10:-1:1; 5 4 3 2 1 0 0 0 0 0]
 beq = [0;1;0]
 f = quadprog(H,f,A,b,Aeq,beq)
+
+plot(1:10,f)
+title('force vs t')
+v = zeros(11,1)
+for i=2:1:11
+    v(i) = v(i-1) + f(i-1)
+end
+plot(0:1:10,v)
+title('velocity vs t')
+
+x = zeros(11,1)
+for i=1:1:11
+    if i > 1
+        x(i) = x(i-1) + v(i)
+    else
+        x(i) = v(i)
+    end
+end
+plot(0:1:10,x)
+title('displacement vs t')
 \end{verbatim}
 
   \end{itemize}
