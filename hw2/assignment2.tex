@@ -565,7 +565,7 @@ title('displacement vs t')
         & 0_{1\times (m+n)} & h_0 & .. & h_{n-1}\\
       \end{bmatrix}\\
       A_2 &= A\\
-      A_2(t_0+D,:) &= 0\\
+      A_2(t_0+D,:) &= 0 //\text{ zero out the row entries}\\
       H &= A_2^T A_2\\
       X_i &=0, \forall i \in \{1,..,n\} \cup \{n+m+1,..,2n+m\}\\
       A_{eq}&=A(t_0+D,:)
@@ -576,7 +576,7 @@ title('displacement vs t')
       A_{eq}X&=1\\
       X_i &=0, \forall i \in \{1,..,n\} \cup \{n+m+1,..,2n+m\}
     \end{align*}
-    Vary D in range $[-(m+n-1),1]$ and and solve QP to find best $g$ using lowest $X^THX$.\\
+    Vary D in range $[-(m+n-1),1]$ and and solve QP to find best $g$ using lowest objective, $X^THX$.\\
 
     \pagebreak
     Solver:
@@ -650,21 +650,21 @@ assert(l==d_best);
 
   \begin{figure}[H]
     \centering
-    \includegraphics[width=12cm]{q10/part_b_hist_y.png}
+    \includegraphics[width=9cm]{q10/part_b_hist_y.png}
   \end{figure}
   \begin{figure}[H]
     \centering
-    \includegraphics[width=12cm]{q10/part_b_hist_z.png}
+    \includegraphics[width=9cm]{q10/part_b_hist_z.png}
   \end{figure}
   We have recovered the original signal. The output distribution is reasonable in that it has binary modes which is what we expect from given knowledge of the original signal input format.
 
-% \begin{verbatim}
-% hist(y);
-% title('histogram of y');
-% z=conv(y,g_best,'same');
-% hist(z);
-% title('histogram of conv(y,g)');
-% \end{verbatim}
+\begin{verbatim}
+hist(y);
+title('histogram of y');
+z=conv(y,g_best,'same');
+hist(z);
+title('histogram of conv(y,g)');
+\end{verbatim}
   \end{itemize}
   
 \end{enumerate}
