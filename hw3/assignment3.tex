@@ -1,0 +1,156 @@
+\documentclass[12pt,letter]{article}
+
+%% \usepackage[fleqn]{amsmath}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amsfonts,amsthm,bm}
+\usepackage{breqn}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{tikz}
+\usepackage{algorithm2e}
+\usepackage{siunitx}
+\usepackage{graphicx}
+\usepackage{subcaption}
+%% \usepackage{datetime}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{mathrsfs}
+\usepackage{fancyhdr}
+\usepackage{fancyvrb}
+\usepackage{parskip} %turns off paragraph indent
+\usepackage{float}
+\usepackage{empheq}
+
+\pagestyle{fancy}
+
+\usetikzlibrary{arrows}
+
+\DeclareMathOperator*{\argmin}{argmin}
+\newcommand*{\argminl}{\argmin\limits}
+
+\newcommand{\mathleft}{\@fleqntrue\@mathmargin0pt}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\ppartial}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\norm}[1]{\|#1\|}
+\newcommand{\set}[1]{\{#1\}}
+\newcommand{\notimplies}{\;\not\!\!\!\implies}
+
+\setcounter{MaxMatrixCols}{20}
+
+\begin {document}
+
+  % \begin{cases}
+  %     0, & \text{if}\ a=1 \\
+  %     1, & \text{otherwise}
+  %   \end{cases}
+
+\lhead{Convex Optimization - HW3}
+\rhead{(Bill) Yuan Liu, 996954078, 2020/02/29}
+
+\begin{enumerate}
+\item Q 5.12 textbook\\
+  Derive dual problem for: $min_x - \sum_i log(b_i-a_i^Tx), x: a_i^Tx \leq b_i, \forall i \in \{1,..,m\}$
+  \begin{align*}
+    &y_i = b_i-a_i^Tx\\
+    &a_i^Tx \leq b_i\\
+    &L(x,y,\lambda,v)=-\sum_i log y_i + \sum_i \lambda_i(a_i^Tx-b_i) + \sum_i v_i(y_i+a_i^Tx-b_i)\\
+    &g(\lambda,v)=\inf_{x,y} L(x,y,\lambda,v)\\
+    &g(\lambda,v)=\inf_{x,y}-\sum_i log y_i + \sum_i \lambda_i(a_i^Tx-b_i) + \sum_i v_i(y_i+a_i^Tx-b_i)\\
+    &(\exists i)\lambda_i \neq 0 \implies \lambda_i(a_i^Tx-b_i)\ unbounded,\ so\ \lambda = 0\\
+    &g(\lambda,v)=\inf_{x,y}-\sum_i log y_i + \sum_i v_i(y_i+a_i^Tx-b_i)\\
+    &g(\lambda,v)=\inf_{x,y}-\sum_i log y_i + v^Ty + v^TAx - v^Tb\\
+    &(\exists i)v_i < 0 \implies v^Ty\ unbounded,\ so\ v \succeq 0\\
+    &\frac{\partial}{\partial y_i}-\sum_i log y_i + v^Ty + v^TAx - v^Tb=-\frac{1}{y_i} + v_i=0\\
+    &y_i = \frac{1}{v_i}, v_i \neq 0\\
+    &(\forall i) v_i \neq 0 \wedge v_i \geq 0 \implies v \succ 0\\
+    &\frac{\partial}{\partial x}-\sum_i log y_i + v^Ty + v^TAx - v^Tb=A^Tv=0\\
+    &g(\lambda,v)=
+      \begin{cases}
+        -\sum_i log \frac{1}{v_i} + \sum_i \frac{v_i}{v_i} - v^Tb, & \text{if } A^Tv=0 \wedge v \succ 0\\
+        -\infty, & \text{otherwise}
+      \end{cases}
+  \end{align*}
+  Dual problem:
+  \begin{align*}
+    \max_{\lambda,v} &\sum_i log v_i + m - v^Tb = -(\min_{\lambda,v}-\sum_i log v_i - m + v^Tb)\\
+    s.t.\ &A^Tv = 0\\
+    &-v_i \leq 0, \forall i\\
+  \end{align*}
+  \pagebreak
+\item Q 5.27 Equality constrained least squares\\
+  Give KKT conditions, derive expressions for primal and dual solutions.
+  \begin{align*}
+    \min_x & \norm{Ax-b}_2^2\\
+    s.t.\ & Gx=h            
+  \end{align*}
+  \begin{align*}
+    &f_0 = x^TA^TAx + 2b^TAx + b^Tb\\
+    &h_0 = Gx-h\\
+    &L(x,\lambda,v) = f_0 + v^Th_0\\
+    &L(x,\lambda,v) = x^TA^TAx - 2b^TAx + b^Tb + v^T(Gx-h)\\
+    &\frac{\partial L}{\partial x^*} = 0 = 2A^TAx^* - 2A^Tb + G^Tv\\
+    \\
+    &KKT\ conditions:\\
+    &x^* = \frac{1}{2}(A^TA)^{-1}(2A^Tb - G^Tv)\\
+    &Gx^*-h = 0\\
+    \\
+    &g(\lambda,v)= \min_x L(x,\lambda,v) = \frac{1}{4}(2A^Tb-G^Tv)^T(A^TA)^{-1}(2A^Tb-G^Tv)\\
+    &-2b^TA(\frac{1}{2}(A^TA)^{-1}(2A^Tb-G^Tv)) + b^Tb + v^T(G\frac{1}{2}(A^TA)^{-1}(2A^Tb-G^Tv)-h)\\
+    &g(\lambda,v)= \min_x L(x,\lambda,v) = \frac{1}{4}(2A^Tb)^T(A^TA)^{-1}(2A^Tb)-(A^Tb)^T(A^TA)^{-1}(G^Tv)\\
+    &+\frac{1}{4}(G^Tv)^T(A^TA)^{-1}(G^Tv) +b^TA((A^TA)^{-1}G^Tv)) -h^Tv + v^TG\frac{1}{2}(A^TA)^{-1}(2A^Tb-G^Tv) \\
+    &- b^TA(A^TA)^{-1}2A^Tb) + b^Tb\\
+    &\text{rid of constants and simplify}:\\
+    &g(\lambda,v)= \min_x L(x,\lambda,v) = -\frac{1}{4}(G^Tv-2A^Tb)^T(A^TA)^{-1}(G^Tv-2A^Tb) \\
+    &-\frac{1}{2}(Gv^T)^T(A^TA)^{-1}(G^Tv) -h^Tv\\
+  \end{align*}
+  Dual problem:
+  \begin{align*}
+    \max_{\lambda,v} & g(\lambda,v) = \max_v -\frac{1}{4}(G^Tv-2A^Tb)^T(A^TA)^{-1}(G^Tv-2A^Tb) \\
+    &-\frac{1}{2}(Gv^T)^T(A^TA)^{-1}(G^Tv) -h^Tv\\
+    s,t.\ & Gx^*-h=0
+  \end{align*}
+  Solve for $v^*$:\\
+  \begin{align*}
+    &Gx^*-h=0\\
+    &x^* = \frac{1}{2}(A^TA)^{-1}(2A^Tb - G^Tv^*)\\
+    &G\frac{1}{2}(A^TA)^{-1}(2A^Tb - G^Tv^*)-h=0\\
+    &v^*=2G^{-T}(A^Tb-A^TAG^{-1}h)\\
+  \end{align*}
+  \pagebreak
+\item Q 5.35 Sensitivity analysis of GP\\
+  \pagebreak
+\item Q 5.42 \\
+  \pagebreak
+\item Strong Duality for LP:\\
+  Find the dual of the primal and argue that \\
+  a) if the primal is unbounded then the dual is infeasible\\
+  b) if the primal is infeasible then the dual is either infeasible or unbounded\\
+  
+  Primal:
+  \begin{align*}
+    \min_x\ & c^Tx\\
+    s.t.\ & Ax \geq b\\
+           & x \geq 0
+  \end{align*}
+  \begin{align*}
+    L(x,\lambda,v) = c^Tx + \lambda_1^T(b-Ax) + \lambda_2^T(-x)\\
+    L(x,\lambda,v) = (c^T-\lambda_1^TA -\lambda_2^T)x + \lambda_1^Tb\\
+    \min_x L(x,\lambda,v) =
+    \begin{cases}
+      b^T\lambda_1, & c -A^T\lambda_1-\lambda_2 = 0\\
+      -\infty, & o/w
+    \end{cases}
+  \end{align*}
+  Dual:
+  \begin{align*}
+    \max_{\lambda_1,\lambda_2}\ & b^T\lambda_1\\
+    s.t.\ & c - A^T\lambda_1 - \lambda_2 = 0\\
+    % \lamba_1 < 0 \vee \lambda_2 < 0 \implies 
+  \end{align*}
+  
+\end{enumerate}
+
+
+\end {document}
