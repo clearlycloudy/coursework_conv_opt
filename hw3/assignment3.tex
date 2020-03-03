@@ -124,31 +124,175 @@
 \item Q 5.42 \\
   \pagebreak
 \item Strong Duality for LP:\\
-  Find the dual of the primal and argue that \\
-  a) if the primal is unbounded then the dual is infeasible\\
-  b) if the primal is infeasible then the dual is either infeasible or unbounded\\
-  
   Primal:
   \begin{align*}
     \min_x\ & c^Tx\\
     s.t.\ & Ax \geq b\\
            & x \geq 0
   \end{align*}
+  Find the dual of the primal and argue that
+  \begin{itemize}
+  \item a) if the primal is unbounded then the dual is infeasible
+    \begin{align*}
+      L(x,\lambda,v) &= c^Tx + \lambda_1^T(b-Ax) + \lambda_2^T(-x)\\
+      L(x,\lambda,v) &= (c^T-\lambda_1^TA -\lambda_2^T)x + \lambda_1^Tb\\
+      g(\lambda,v) &= \min_x L(x,\lambda,v) =
+      \begin{cases}
+        b^T\lambda_1, & c -A^T\lambda_1-\lambda_2 = 0\\
+        -\infty, & o/w
+      \end{cases}\\
+      Dual:\\
+      \max_{\lambda_1,\lambda_2}\ & b^T\lambda_1\\
+      s.t.\ & c - A^T\lambda_1 - \lambda_2 = 0\\
+      \\
+      g(\lambda,v) &\leq c^Tx^*\ (weak\ duality)\\
+      primal\ & unbounded:\ c^Tx^*= -\infty \implies\\
+      g(\lambda,v) &= -\infty \implies c -A^T\lambda_1-\lambda_2 \neq 0 \implies infeasible\ case\ of\ dual
+    \end{align*}
+  \item b) if the primal is infeasible then the dual is either infeasible or unbounded
+    \begin{align*}
+      &primal\ infeasible \implies b-Ax \not\leq 0 \vee -x \not\leq 0\\
+      &\min_x c^Tx +\lambda_1^T(b-Ax) + \lambda_2^T(-x) \leq c^Tx\\
+      % &(\forall i) (b-Ax)_i > 0 \implies \lambda_{1_i}\ may\ be\ nagative\\
+      % &(\forall i) (-x)_i > 0 \implies \lambda_{2_i}\ may\ be\ nagative\\
+      \\
+      &dual\ unbounded\ case:\\
+      &suppose\ c - A^T\lambda_1 - \lambda_2 = 0,\ substitute\ for\ \lambda_1:\\
+      &Dual: \max_{\lambda_1,\lambda_2}\ b^T\lambda_1 = \max_{\lambda_1,\lambda_2} b^TA^{-T}c-b^TA^{-T}\lambda_2,\ such\ that:\\
+      &(\forall i) (b-Ax)_i > 0 \implies \lambda_{1_i}\ may\ be\ nagative,\ and\\
+      &(\forall i) (-x)_i > 0 \implies \lambda_{2_i}\ may\ be\ nagative,\ and\\
+      &c - A^T\lambda_1 - \lambda_2 = 0\\
+      \\
+      &let\ d = b^TA^{-T}c\\
+      &let\ e^T = b^TA^{-T}\\
+      &Dual: \max_{\lambda_1,\lambda_2}\ d-e^T\lambda_2\\
+      &(\exists i) e_i > 0: select\ \lambda_{2_i} \to -a \ and\ (\exists i) e_i < 0: select\ \lambda_{2_i} \to a, a \to +\infty \ such\ that\ it\ satisfies:\\
+      &c - A^T\lambda_1 - \lambda_2 = 0,\ then\ e^T\lambda_2\ is\ unbounded\\
+      &eg: c=\begin{bmatrix}0\\0\end{bmatrix}, b=\begin{bmatrix}1\\-1\end{bmatrix},A=I, Ax \not\succeq b, x \not\succeq 0\\
+      &Dual:\ \max_{\lambda_1,\lambda_2}\ d- I^T\begin{bmatrix}1\\-1\end{bmatrix}^T\lambda_2,\ select\ \lambda_2 =\begin{bmatrix}-a\\a\end{bmatrix}\\
+      &c-A^T\lambda_1-\lambda_2 =0=\begin{bmatrix}0\\0\end{bmatrix} - \lambda_1 - \begin{bmatrix}-a\\a\end{bmatrix} = 0\\
+      &select:\ \lambda_1 =\begin{bmatrix}a\\-a\end{bmatrix}\\
+      &let\ a \to +\infty \implies \max_{\lambda_1,\lambda_2}\ d - I^T\begin{bmatrix}1\\-1\end{bmatrix}^T\lambda_2\bigg|_{\lambda_2=[-a,a]^T} = d + 2a = +\infty \implies dual\ unbounded\\
+      \\
+      &dual\ infeasible\ case:\\
+      &suppose: c > 0, x \not\geq 0, A=-1, Ax \geq b\\
+      &Ax \geq b \implies \lambda_1 \geq 0\\
+      &x < 0 \implies \lambda_2 \leq 0\\
+      &c-A^T\lambda_1-\lambda_2 = c+\lambda_1 - \lambda_2\\
+      &c+\lambda_1>0 \wedge -\lambda_2 \geq 0 \implies c-A^T\lambda_1-\lambda_2 \not=0 \implies dual\ is\ not\ feasible
+    \end{align*}
+  \end{itemize}
+\item Game Theory
   \begin{align*}
-    L(x,\lambda,v) = c^Tx + \lambda_1^T(b-Ax) + \lambda_2^T(-x)\\
-    L(x,\lambda,v) = (c^T-\lambda_1^TA -\lambda_2^T)x + \lambda_1^Tb\\
-    \min_x L(x,\lambda,v) =
-    \begin{cases}
-      b^T\lambda_1, & c -A^T\lambda_1-\lambda_2 = 0\\
-      -\infty, & o/w
-    \end{cases}
+    &\min_x \max_y x^TPy\\
+    s.t.\ &Ax \leq b\\
+    &Cy \leq d
   \end{align*}
-  Dual:
   \begin{align*}
-    \max_{\lambda_1,\lambda_2}\ & b^T\lambda_1\\
-    s.t.\ & c - A^T\lambda_1 - \lambda_2 = 0\\
-    % \lamba_1 < 0 \vee \lambda_2 < 0 \implies 
-  \end{align*}
+      &\max_y \min_x x^TPy\\
+      s.t.\ &Ax \leq b\\
+      &Cy \leq d
+    \end{align*}
+  \begin{itemize}
+  \item show that min-max problem as the same optimal value as the following minimization problem:
+    \begin{align*}
+      &\min_{\lambda,x} d^T \lambda\\
+      s.t.\ & C^T \lambda = P^Tx\\
+      &Ax \leq b\\
+      &\lambda \geq 0
+    \end{align*}
+    Inner optimization problem:
+    \begin{align*}
+      \max_y & (P^Tx)^T y = -(\min_y -(P^Tx)^T y)\\
+      s.t.\ &Ax \leq b\\
+             &Cy \leq d\\
+      g(\lambda_1,\lambda_2) & = \min_y -(P^Tx)^T y =
+                           \begin{cases}
+                             \lambda_1^T(Ax-b)-\lambda_2^Td, & -P^Tx+C^T\lambda_2 = 0\\
+                             -\infty, & o/w
+                           \end{cases}\\
+      \max_{\lambda_1,\lambda_2}\ & g(\lambda_1,\lambda_2) = \max_{\lambda_1,\lambda_2} -\lambda_2^Td + \lambda_1^T(Ax-b)\\
+      s.t.\ & -P^Tx+C^T\lambda_2 = 0\\
+             &\lambda_1, \lambda_2 \geq 0\\
+             & \lambda_1^T(Ax-b) \leq 0 \implies\\
+      \max_{\lambda_1,\lambda_2}\ & g(\lambda_1,\lambda_2) = \max_{\lambda_2} -\lambda_2^Td\\
+      -(\min_y & -(P^Tx)^T y) = - \max_{\lambda_1,\lambda_2} g(\lambda_1,\lambda_2) = -(-\min_{\lambda_2} \lambda_2^Td) = \min_{\lambda_2} \lambda_2^Td\\
+             rename\ &\lambda_2\ to\ \lambda\ and\ enclose\ with\ outer\ minimization:\\
+      \min_{x,\lambda}&\ \lambda^Td\\
+      s.t.\ &P^Tx = C^T\lambda\\
+             &Ax \leq b\\
+             &\lambda \geq 0
+    \end{align*}
+    \pagebreak
+  \item show that max-min problem as the same optimal value as the following maximization problem:
+    \begin{align*}
+      &\max_{y,v} -b^T v\\
+      s.t.\ & A^Tv + Py = 0\\
+      &Cy \leq d\\
+      &v \geq 0
+    \end{align*}
+    Inner optimization problem:
+    \begin{align*}
+      \min_x &\ x^TPy\\
+      s.t.\ &Ax \leq b\\
+             &Cy \leq d
+      \\
+      g(\lambda_1,\lambda_2) & = \min_x x^TPy + \lambda_1^T(Ax-b) + \lambda_2^T(Cy-d)\\
+      & =
+        \begin{cases}
+          -\lambda_1^Tb + \lambda_2^T(Cy-d), & P^y + A^T\lambda_1 = 0\\
+          - \infty, & o/w
+        \end{cases}\\
+      max_{\lambda_1,\lambda_2} g(\lambda_1,\lambda_2) & = \max_{\lambda_1,\lambda_2} -\lambda_1^Tb + \lambda_2^T(Cy-d)\\
+      s.t.\ & P^Ty + A^T\lambda_1 = 0\\
+      &\lambda_1 \geq 0\\
+      &\lambda_2 \geq 0\\
+      &Ax-b \leq 0\\
+      &Cy-d \leq 0\\
+      &\lambda_2^T(Cy-d)  \leq 0 \implies\\
+      \max_{\lambda_1,\lambda_2} & \ g(\lambda_1,\lambda_2) = \max_{\lambda_1,\lambda_2} -\lambda_1^Tb\\
+      s.t.\ & P^Ty + A^T\lambda_1 = 0\\
+      &\lambda_1 \geq 0\\
+             &Cy-d \leq 0\\
+             &rename\ variables\ and\ enclose\ with\ outer\ optimization:\\
+      \max_{y,v} &-b^Tv\\
+      s.t.\ &P^T y + A^Tv = 0\\
+      Cy &\leq d\\
+      v &\geq 0
+    \end{align*}
+  \item show the above problems have the same optimal value (min-max equals max-min)
+    \begin{align*}
+      \min_{x,\lambda}&\ d^T \lambda\\
+      s.t.\ & C^T\lambda = P^x\\
+                       &Ax \leq b\\
+                       &\lambda \geq 0\\
+      \\
+      g(a_1,a_2,w) &= \min_{x,\lambda} d^T\lambda + a_1^T(Ax-b)+a_2^T(-\lambda) + w^T(C^T\lambda-P^Tx)\\
+      s.t.\ &a_1 \geq 0\\
+                       &a_2 \geq 0\\
+      &Ax-b \leq 0\\
+                       &-\lambda \leq 0\\
+                       &C^T\lambda - P^Tx = 0\\
+      &g(a_1,a_2,w) =
+                     \begin{cases}
+                       -a_1^Tb , & d-a_2+Cw=0 \wedge A^Ta_1-Pw=0\\
+                       -\infty, & o/w
+                     \end{cases}\\
+      dual:&\\
+      \max_{a_1,a_2,w} & g(a_1,a_2,w) = -b^Ta_1\\
+      s.t.\ & d-a_2+Cw=0\\
+                      &A^Ta_1-Pw=0\\
+                      &a_2 \geq 0 \implies d+Cw \geq 0\\
+                      &a_1 \geq 0\\
+      \\
+      let\ &v = a_1, y = -w\\
+      \max_{v,y}&\ g(v,y) = -b^Tv\\
+      s.t.\ &A^Tv+Py=0\\
+                      &Cy \leq d\\
+                      &v \geq 0\\
+    \end{align*}
+    We start with equivalent formulation of min-max and arrive at a equivalent formulation of max-min problem thus they obtain the same optimal value.
+  \end{itemize}
   
 \end{enumerate}
 
