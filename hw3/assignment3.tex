@@ -120,6 +120,50 @@
   \end{align*}
   \pagebreak
 \item Q 5.35 Sensitivity analysis of GP\\
+  After log tranformation:
+  \begin{align*}
+    &\min_y f_0(y)\\
+    s.t.\ & log f_i(y) \leq 0\\
+    & log h_i(y) = 0
+  \end{align*}
+  Perturbed problem:
+  \begin{align*}
+    &\min_y f_0(y)\\
+    s.t.\ & log f_i(y) \leq u_i\\
+    & log h_i(y) = v_i
+  \end{align*}
+  where $y_i = log(x_i)$\\
+  
+  $L:=Lagrangian\ of\ original\ problem$\\
+  $L':=Lagrangian\ of\ perturbed\ problem$\\
+  \begin{align*}
+    L'(y,\lambda,w) &= log\ f_0(y) + \sum_i \lambda_i(log\ f_i(y)-u_i) + \sum_i w_i(log\ h_i(y) -v_i)\\
+    L'(y,\lambda,w) &= L(y,\lambda,w) -\sum_i \lambda_i u_i + -\sum_i w_i v_i\\
+    p(u,v) &= \min_y L'(y,\lambda,w) = \min_y L(y,\lambda,w) - \lambda^Tu- w^Tv
+  \end{align*}
+  Dual:
+  \begin{align*}
+  \max_{\lambda,w} p(u,v) &= p^*(u,v) = \max_{\lambda,w} \min_y L(y,\lambda,w) - \lambda^Tu- w^Tv\\
+    let\ p(0,0) &= \max_{\lambda,w} \min_y L(y,\lambda,w)\\
+    p^*(u,v) &= p(0,0) + (\max_{\lambda,w} -\lambda^Tu- w^Tv)
+  \end{align*}
+  let\ $\lambda^*, w^*$ be parameters for optimal $p(u,v)$
+  \begin{align*}
+    p^*(u,v) &= p(0,0) -{\lambda^*}^Tu- {w^*}^Tv\\
+             u\ not\ present\ &in\ original\ problem \implies\\
+    \frac{\partial}{\partial u_i}p(0,0) &= 0, \forall i\\
+             v\ not\ present\ &in\ original\ problem \implies\\
+    \frac{\partial}{\partial v_i}p(0,0) &= 0, \forall i\\
+    \frac{\partial}{\partial u_i} p^*(u,v) &= -\lambda_i^*, \forall i\\
+    \frac{\partial}{\partial v_i} p^*(u,v) &= -w_i^*, \forall i\\
+  \end{align*}
+  
+  Relaxation of ith constraint by $\alpha$ percent:\\
+  $\partial p^*(u_i,0) &= -\lambda_i^*\partial u_i$\\
+  $\partial u_i = \alpha \implies$ objective function of log transformed problem experiences a decrease in value by $\lambda_i \alpha$\\
+  Converting back to the original variable through identity $x=e^{y}$\\
+  $z$ small $\implies e^{z} \approx 1+ z$ via Taylor expansion\\
+  $e^{-\lambda_i^* \alpha} \approx 1 - \lambda_i^* \alpha \implies$ objective function experiences an improvement of $\lambda_i^* \alpha$ percent since it is a minimization problem.\\
   \pagebreak
 \item Q 5.42 \\
   \pagebreak
