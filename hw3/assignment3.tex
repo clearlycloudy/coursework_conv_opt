@@ -96,13 +96,13 @@
     &x^* = \frac{1}{2}(A^TA)^{-1}(2A^Tb - G^Tv)\\
     &Gx^*-h = 0\\
     \\
-    &g(\lambda,v)= \min_x L(x,\lambda,v) = \frac{1}{4}(2A^Tb-G^Tv)^T(A^TA)^{-1}(2A^Tb-G^Tv)\\
+    &g(\lambda,v)= \inf_x L(x,\lambda,v) = \frac{1}{4}(2A^Tb-G^Tv)^T(A^TA)^{-1}(2A^Tb-G^Tv)\\
     &-2b^TA(\frac{1}{2}(A^TA)^{-1}(2A^Tb-G^Tv)) + b^Tb + v^T(G\frac{1}{2}(A^TA)^{-1}(2A^Tb-G^Tv)-h)\\
-    &g(\lambda,v)= \min_x L(x,\lambda,v) = \frac{1}{4}(2A^Tb)^T(A^TA)^{-1}(2A^Tb)-(A^Tb)^T(A^TA)^{-1}(G^Tv)\\
+    &g(\lambda,v)= \inf_x L(x,\lambda,v) = \frac{1}{4}(2A^Tb)^T(A^TA)^{-1}(2A^Tb)-(A^Tb)^T(A^TA)^{-1}(G^Tv)\\
     &+\frac{1}{4}(G^Tv)^T(A^TA)^{-1}(G^Tv) +b^TA((A^TA)^{-1}G^Tv)) -h^Tv + v^TG\frac{1}{2}(A^TA)^{-1}(2A^Tb-G^Tv) \\
     &- b^TA(A^TA)^{-1}2A^Tb) + b^Tb\\
     &\text{rid of constants and simplify}:\\
-    &g(\lambda,v)= \min_x L(x,\lambda,v) = -\frac{1}{4}(G^Tv-2A^Tb)^T(A^TA)^{-1}(G^Tv-2A^Tb) \\
+    &g(\lambda,v)= \inf_x L(x,\lambda,v) = -\frac{1}{4}(G^Tv-2A^Tb)^T(A^TA)^{-1}(G^Tv-2A^Tb) \\
     &-\frac{1}{2}(Gv^T)^T(A^TA)^{-1}(G^Tv) -h^Tv\\
   \end{align*}
   Dual problem:
@@ -134,19 +134,21 @@
   \end{align*}
   where $y_i = log(x_i)$\\
   
-  $L:=Lagrangian\ of\ original\ problem$\\
-  $L':=Lagrangian\ of\ perturbed\ problem$\\
+  Let $L$:=Lagrangian of original problem after log transform\\
+  Let $L'$:=Lagrangian of perturbed problem after log transform\\
   \begin{align*}
     L'(y,\lambda,w) &= log\ f_0(y) + \sum_i \lambda_i(log\ f_i(y)-u_i) + \sum_i w_i(log\ h_i(y) -v_i)\\
     L'(y,\lambda,w) &= L(y,\lambda,w) -\sum_i \lambda_i u_i + -\sum_i w_i v_i\\
-    p(u,v) &= \min_y L'(y,\lambda,w) = \min_y L(y,\lambda,w) - \lambda^Tu- w^Tv
+    p(u,v) &= \inf_y L'(y,\lambda,w) = \inf_y L(y,\lambda,w) - \lambda^Tu- w^Tv
   \end{align*}
   Dual:
   \begin{align*}
-  \max_{\lambda,w} p(u,v) &= p^*(u,v) = \max_{\lambda,w} \min_y L(y,\lambda,w) - \lambda^Tu- w^Tv\\
-    let\ p(0,0) &= \max_{\lambda,w} \min_y L(y,\lambda,w)\\
+  \max_{\lambda,w} p(u,v) &= p^*(u,v) = \max_{\lambda,w} \inf_y L(y,\lambda,w) - \lambda^Tu- w^Tv\\
+    let\ p(0,0) &= \max_{\lambda,w} \inf_y L(y,\lambda,w)\\
     p^*(u,v) &= p(0,0) + (\max_{\lambda,w} -\lambda^Tu- w^Tv)
   \end{align*}
+  \\
+  
   let\ $\lambda^*, w^*$ be parameters for optimal $p(u,v)$
   \begin{align*}
     p^*(u,v) &= p(0,0) -{\lambda^*}^Tu- {w^*}^Tv\\
@@ -155,17 +157,48 @@
              v\ not\ present\ &in\ original\ problem \implies\\
     \frac{\partial}{\partial v_i}p(0,0) &= 0, \forall i\\
     \frac{\partial}{\partial u_i} p^*(u,v) &= -\lambda_i^*, \forall i\\
-    \frac{\partial}{\partial v_i} p^*(u,v) &= -w_i^*, \forall i\\
+    \frac{\partial}{\partial v_i} p^*(u,v) &= -w_i^*, \forall i
+  \end{align*}
+  Inverse log transform $x \to e^x$ into original form of objective:
+  \begin{align*}
+    e^{\frac{\partial}{\partial u_i} p^*(u,v)} &= e^{-\lambda_i^*}, \forall i\\
+    e^{\frac{\partial}{\partial v_i} p^*(u,v)} &= e^{-w_i^*}, \forall i\\
   \end{align*}
   
   Relaxation of ith constraint by $\alpha$ percent:\\
   $\partial p^*(u_i,0) &= -\lambda_i^*\partial u_i$\\
   $\partial u_i = \alpha \implies$ objective function of log transformed problem experiences a decrease in value by $\lambda_i \alpha$\\
-  Converting back to the original variable through identity $x=e^{y}$\\
+  Converting objective back via inverse of log: $x \to e^{y}$\\
   $z$ small $\implies e^{z} \approx 1+ z$ via Taylor expansion\\
   $e^{-\lambda_i^* \alpha} \approx 1 - \lambda_i^* \alpha \implies$ objective function experiences an improvement of $\lambda_i^* \alpha$ percent since it is a minimization problem.\\
   \pagebreak
-\item Q 5.42 \\
+\item Q 5.42. Find Lagrange dual problem in inequality form.
+  \begin{align*}
+    \min_x\ & c^Tx\\
+    s.t.\ & Ax \preceq_K b\\
+  \end{align*}
+  \begin{align*}
+    L(x,\lambda,v) & = c^Tx + \lambda^T(Ax-b)\\
+    \lambda & \succeq_{K^*} 0\\
+    g (\lambda,v) &= \inf_x L(x,\lambda,v)\\
+    g (\lambda,v) &=
+                    \begin{cases}
+                      -\lambda^Tb, & c^Tx + \lambda^TAx = 0\\
+                      -\infty, & o/w
+                    \end{cases}
+  \end{align*}
+  Dual:
+  \begin{align*}
+    \max_{\lambda,v}\ & g(\lambda,v) = \max_{\lambda}\ -b^T\lambda\\
+    s.t.\ & c+A^T\lambda = 0\\
+    \lambda & \succeq_{K^*} 0\\
+    \\
+    let\ y & = -\lambda\\
+    \\
+    \max_{y}&\ b^Ty\\
+    s.t.\ & A^Ty = c\\
+    y & \preceq_{K^*} 0\\
+  \end{align*}
   \pagebreak
 \item Strong Duality for LP:\\
   Primal:
@@ -180,7 +213,7 @@
     \begin{align*}
       L(x,\lambda,v) &= c^Tx + \lambda_1^T(b-Ax) + \lambda_2^T(-x)\\
       L(x,\lambda,v) &= (c^T-\lambda_1^TA -\lambda_2^T)x + \lambda_1^Tb\\
-      g(\lambda,v) &= \min_x L(x,\lambda,v) =
+      g(\lambda,v) &= \inf_x L(x,\lambda,v) =
       \begin{cases}
         b^T\lambda_1, & c -A^T\lambda_1-\lambda_2 = 0\\
         -\infty, & o/w
@@ -237,7 +270,7 @@
       s.t.\ &Ax \leq b\\
       &Cy \leq d
     \end{align*}
-  \begin{itemize}
+  \begin{enumerate}
   \item show that min-max problem as the same optimal value as the following minimization problem:
     \begin{align*}
       &\min_{\lambda,x} d^T \lambda\\
@@ -250,7 +283,7 @@
       \max_y & (P^Tx)^T y = -(\min_y -(P^Tx)^T y)\\
       s.t.\ &Ax \leq b\\
              &Cy \leq d\\
-      g(\lambda_1,\lambda_2) & = \min_y -(P^Tx)^T y =
+      g(\lambda_1,\lambda_2) & = \inf_y -(P^Tx)^T y =
                            \begin{cases}
                              \lambda_1^T(Ax-b)-\lambda_2^Td, & -P^Tx+C^T\lambda_2 = 0\\
                              -\infty, & o/w
@@ -261,7 +294,7 @@
              & \lambda_1^T(Ax-b) \leq 0 \implies\\
       \max_{\lambda_1,\lambda_2}\ & g(\lambda_1,\lambda_2) = \max_{\lambda_2} -\lambda_2^Td\\
       -(\min_y & -(P^Tx)^T y) = - \max_{\lambda_1,\lambda_2} g(\lambda_1,\lambda_2) = -(-\min_{\lambda_2} \lambda_2^Td) = \min_{\lambda_2} \lambda_2^Td\\
-             rename\ &\lambda_2\ to\ \lambda\ and\ enclose\ with\ outer\ minimization:\\
+             rename\ &\lambda_2\ to\ \lambda\ and\ enclose\ with\ outer\ minimization\ over\ x:\\
       \min_{x,\lambda}&\ \lambda^Td\\
       s.t.\ &P^Tx = C^T\lambda\\
              &Ax \leq b\\
@@ -281,7 +314,7 @@
       s.t.\ &Ax \leq b\\
              &Cy \leq d
       \\
-      g(\lambda_1,\lambda_2) & = \min_x x^TPy + \lambda_1^T(Ax-b) + \lambda_2^T(Cy-d)\\
+      g(\lambda_1,\lambda_2) & = \inf_x x^TPy + \lambda_1^T(Ax-b) + \lambda_2^T(Cy-d)\\
       & =
         \begin{cases}
           -\lambda_1^Tb + \lambda_2^T(Cy-d), & P^y + A^T\lambda_1 = 0\\
@@ -311,19 +344,19 @@
                        &Ax \leq b\\
                        &\lambda \geq 0\\
       \\
-      g(a_1,a_2,w) &= \min_{x,\lambda} d^T\lambda + a_1^T(Ax-b)+a_2^T(-\lambda) + w^T(C^T\lambda-P^Tx)\\
+      g(a_1,a_2,w) &= \inf_{x,\lambda} d^T\lambda + a_1^T(Ax-b)+a_2^T(-\lambda) + w^T(C^T\lambda-P^Tx)\\
       s.t.\ &a_1 \geq 0\\
                        &a_2 \geq 0\\
       &Ax-b \leq 0\\
                        &-\lambda \leq 0\\
                        &C^T\lambda - P^Tx = 0\\
-      &g(a_1,a_2,w) =
+      g(a_1,a_2,w) &=
                      \begin{cases}
                        -a_1^Tb , & d-a_2+Cw=0 \wedge A^Ta_1-Pw=0\\
                        -\infty, & o/w
                      \end{cases}\\
-      dual:&\\
-      \max_{a_1,a_2,w} & g(a_1,a_2,w) = -b^Ta_1\\
+      Dual:&\\
+      \max_{a_1,a_2,w}\ & g(a_1,a_2,w) = -b^Ta_1\\
       s.t.\ & d-a_2+Cw=0\\
                       &A^Ta_1-Pw=0\\
                       &a_2 \geq 0 \implies d+Cw \geq 0\\
@@ -336,9 +369,32 @@
                       &v \geq 0\\
     \end{align*}
     We start with equivalent formulation of min-max and arrive at a equivalent formulation of max-min problem thus they obtain the same optimal value.
-  \end{itemize}
+  \end{enumerate}
+  \begin{enumerate}
+  \item 
+  \end{enumerate}
+  \pagebreak
+  
+\item Optimal control of a unit mass revisited\\
+  \begin{align*}
+    \norm{p}_1 = \sum_{i=1}^{10} |p_i|\\
+    \norm{p}_{\infty} = \max_{i=1,..,10} |p_i|
+  \end{align*}
+  \begin{enumerate}
+  \item Consider $\norm{p}_1$ problem with same setup in Q9(1) of last assignment. Find optimal solution. Plot optimal force, position, and velocity. Write down the primal and dual solutions.
+  \item
+    \begin{enumerate}
+    \item Verify that for any vector $v$ and $w$, we always have $|w^Tv| \leq \norm{v}_{\infty} \norm{w}_1$
+    \item Let $z$ be any solution of $Az=y$, explain why for any $\lambda$, we must have
+      \begin{align*}
+        \norm{z}_1 \geq \frac{|\lambda^Ty|}{\norm{A^T\lambda}_{\infty}}
+      \end{align*}
+      and thus $z,\lambda$ for which the above inequality is satisfied with equality means $z$ must be optimal.
+    \item Set $\lambda$ to be the Lagrange multiplier associated with the equality constraint in part (a). Use the above inequality to directly verify that the bang-bang solution is optimal.
+    \end{enumerate}
+  \item Repeat part (a) for $\norm{\ast}_{\infty}$ minimization problem.
+  \end{enumerate}
   
 \end{enumerate}
-
 
 \end {document}
