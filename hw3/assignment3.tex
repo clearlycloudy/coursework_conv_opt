@@ -47,7 +47,7 @@
   %   \end{cases}
 
 \lhead{Convex Optimization - HW3}
-\rhead{(Bill) Yuan Liu, 996954078, 2020/02/29}
+\rhead{(Bill) Yuan Liu, 996954078, 2020/03/06}
 
 \begin{enumerate}
 \item Q 5.12 textbook\\
@@ -382,17 +382,302 @@
   \end{align*}
   \begin{enumerate}
   \item Consider $\norm{p}_1$ problem with same setup in Q9(1) of last assignment. Find optimal solution. Plot optimal force, position, and velocity. Write down the primal and dual solutions.
+    \begin{align*}
+      \min_p \sum_{i=1}^{10} |p_i|
+    \end{align*}
+    Constraints: $x(0)=0,x(10)=1,\dot{x}(0)=0,v(0)=0,v(10)=0$\\
+    let $v=\dot{x}$
+    \begin{align*}
+      v(i) &= v(0) + \sum_{j=1}^i p_j/m,m=1\\
+      v(10) &= \sum_{j=1}^i p_j = 0\\
+      x(i) &= x(0) + \sum_{j=0}^i v(j)\\
+      x(i) &= \sum_{j=1}^i \sum_{k=1}^j p_k = \sum_{j=1}^i (i-j+1)p_j\\
+      x(10) &= [10,9,..,1]p=1
+    \end{align*}
+    Primal:
+    \begin{align*}
+      let\ t_i &= |p_i|\\
+      let\ X &= [p_1,..,p_{10}, t_1,..,t_{10}]^T\\
+      \min_X &
+      \begin{bmatrix}
+        1_{1:10}^T & 0_{1:10}^T
+      \end{bmatrix} X\\
+      s.t.\ 
+        &\begin{bmatrix}
+          1^T & 0^T\\
+          10,9,..1 & 0^T
+        \end{bmatrix} X
+                     =
+                     \begin{bmatrix}
+                       0 \\ 1
+                     \end{bmatrix}\\
+      &\begin{bmatrix}
+        I_{10\times 10} & -I_{10\times 10}\\
+        -I_{10\times 10} & -I_{10\times 10}
+      \end{bmatrix}X \leq
+                           \begin{bmatrix}
+                             0_{20 \times 1}
+                           \end{bmatrix}
+    \end{align*}
+    \pagebreak
+    \begin{align*}
+      L(p,t,\lambda,v) &= 1^T t + \lambda_1^T(p-t)+\lambda_2^T(-p-t)+v_1^T(1^Tp) + v_2^T([10..1]p-1)\\
+                       &= (1^T-\lambda_1^T-\lambda_2^T)t+(\lambda_1^T-\lambda_2^T+v_2^T[10..1] + v_1^T1^T)p -v_2^T1\\
+      g(\lambda,v) &= \inf_{p,t} L(p,t,\lambda,v)\\
+                       &=
+                         \begin{cases}
+                           -v_2, & 1-\lambda_1-\lambda_2=0, \lambda_1-\lambda_2+[10..1]^T v_2 + 1v_1 =0\\
+                           -\infty, & o/w
+                         \end{cases}
+    \end{align*}
+    \begin{align*}
+      \max_{\lambda,v}&\ -v_2\\
+      s.t.\ &1-\lambda_1-\lambda_2 = 0\\
+                      &\lambda_1-\lambda_2 +
+                        \begin{bmatrix}
+                          10 \\ ..\\ 1
+                        \end{bmatrix}v_2 + 1_{10\times 1}v_1 = 0\\
+      \lambda_1 &\geq 0\\
+      \lambda_2 &\geq 0
+    \end{align*}
+    Dual:
+    \begin{align*}
+      &let\ X=[\lambda_1, \lambda_2, v_1, v_2]^T\\
+      &\lambda_1, \lambda_2 \in \R^{10}\\
+      &v_1,v_2 \in R\\
+      \max_{X}&\
+                \begin{bmatrix}
+                  0^T & 0^T & 0 & -1
+                \end{bmatrix}X\\
+      s.t.\ &
+              \begin{bmatrix}
+                I_{10\times 10} & -I_{10\times 10} & 1_{10\times 1} & [10..1]^T& \\
+                I_{10\times 10} & I_{10\times 10} & 0 & 0
+              \end{bmatrix}X =
+                                                          \begin{bmatrix}
+                                                            0_{10\times 1}\\
+                                                            1_{10\times 1}
+                                                          \end{bmatrix}\\
+      &\begin{bmatrix}
+        -I & -I & 0 & 0
+      \end{bmatrix} X \leq 0
+    \end{align*}
+    Solve using Matlab:\\
+    $cost_{optimal}=0.2222$\\
+    Primal solution:\\
+    $p(1)=0.1111, p(10)=-0.1111, (\forall i \not\in \{1,10\})\ p(i)=0$\\
+    $t(1)=t(10)=0.1111, (\forall i \not\in \{1,10\})\ t(i)=0$\\
+    
+    Dual solution:\\
+    $\lambda_1 = [1,0.8889,0.7778,0.6667,0.5556,0.4444,0.3333,0.2222,0.1111,0]$\\
+    $\lambda_2 = [0, 0.1111, 0.2222, 0.3333, 0.4444, 0.5556, 0.6667, 0.7778, 0.8889, 1]$\\
+    $v_1=1.2222, v_2 =-0.2222$\\
+    
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=10cm]{q7/q7_a_1.png}
+    \includegraphics[width=10cm]{q7/q7_a_2.png}
+    \includegraphics[width=10cm]{q7/q7_a_3.png}
+  \end{figure}
+
+\begin{verbatim}
+%% part a
+f = [zeros(10,1); ones(10,1)]
+A = [eye(10) -eye(10); -eye(10) -eye(10)]
+b= [zeros(20,1)]
+
+Aeq = [ones(1,10) zeros(1,10); 10:-1:1 zeros(1,10)]
+beq = [0;1]
+[xs,fval,exitflag,output,lambda] = linprog(f,A,b,Aeq,beq)
+
+force = xs(1:10)
+plot(1:10,force)
+title('force vs t')
+
+v = zeros(11,1)
+for i=2:1:11
+    v(i) = v(i-1) + force(i-1)
+end
+
+plot(0:1:10,v)
+title('velocity vs t')
+
+x = zeros(11,1)
+for i=1:1:11
+    if i > 1
+        x(i) = x(i-1) + v(i)
+    else
+        x(i) = v(i)
+    end
+end
+
+plot(0:1:10,x)
+title('displacement vs t')
+\end{verbatim}
+    \pagebreak
   \item
     \begin{enumerate}
     \item Verify that for any vector $v$ and $w$, we always have $|w^Tv| \leq \norm{v}_{\infty} \norm{w}_1$
+      \begin{align*}
+        |w^Tv| &= |\sum_i w_i v_i| \leq \sum_i |w_i v_i| \leq  \sum_i |w_i|v', v' = \max_i |v_i|\\
+        |w^Tv| &\leq v' \sum_i |w_i| = \norm{v}_{\infty} \norm{w}_1
+      \end{align*}
     \item Let $z$ be any solution of $Az=y$, explain why for any $\lambda$, we must have
       \begin{align*}
         \norm{z}_1 \geq \frac{|\lambda^Ty|}{\norm{A^T\lambda}_{\infty}}
       \end{align*}
       and thus $z,\lambda$ for which the above inequality is satisfied with equality means $z$ must be optimal.
+      \begin{align*}
+        \frac{|\lambda^Ty|}{\norm{A^T\lambda}_{\infty}} &= \frac{|\lambda^TAz|}{\norm{A^T\lambda}_{\infty}}=\frac{|z^TA^T\lambda|}{\norm{A^T\lambda}_{\infty}}\\
+        |z^TA^T\lambda| &\leq \norm{z}_1 \norm{A^T\lambda}_{\infty}\\
+        \frac{|\lambda^Ty|}{\norm{A^T\lambda}_{\infty}} &\leq \frac{\norm{z}_1 \norm{A^T\lambda}_{\infty}}{\norm{A^T\lambda}_{\infty}}\\
+        \frac{|\lambda^Ty|}{\norm{A^T\lambda}_{\infty}} &\leq \norm{z}_1\\
+      \end{align*}
     \item Set $\lambda$ to be the Lagrange multiplier associated with the equality constraint in part (a). Use the above inequality to directly verify that the bang-bang solution is optimal.
+      \begin{align*}
+        &AX=y\\
+        &\begin{bmatrix}
+          1^T & 0^T\\
+          10,9,..1 & 0^T
+        \end{bmatrix} X
+                     =
+                     \begin{bmatrix}
+                       0 \\ 1
+                     \end{bmatrix}\\
+        &let\ \lambda = [v_1, v_2]^T=[1.2222,-0.2222]^T\\
+        &\norm{X}_1 = \norm{[p_1,...,p_{10},t_1,..,t_{10}]}_1 = 0.1111-0.1111+0.1111+0.1111=0.2222\\
+        &|\lambda^T y| = \bigg|\lambda^T
+          \begin{bmatrix}
+            0\\1
+          \end{bmatrix}\bigg| = 0.2222\\
+        &\bigg\|\begin{bmatrix}
+          1^T & 0^T\\
+          10,9,..1 & 0^T
+        \end{bmatrix}^T \lambda\bigg\|_{\infty} = 1\\
+        &\frac{|\lambda^T y|}{\norm{A^T\lambda}_{\infty}} = 0.2222 = \norm{X}_1\\
+        &tight\ inequality \implies X\ is\ optimal
+      \end{align*}
+      
     \end{enumerate}
+    \pagebreak
   \item Repeat part (a) for $\norm{\ast}_{\infty}$ minimization problem.
+    \begin{align*}
+      \min_{p} \norm{p}_{\infty}
+    \end{align*}
+    \begin{align*}
+      let\ t&=\max_i |p_i|\\
+      \min_{p,t}\ & t\\
+      s.t.\ & p_i \leq t, \forall i\\
+                 & p_i \geq -t, \forall i\\
+                 &1^Tp=0\\
+                 &[10,..,1]p = 1
+    \end{align*}
+    Primal:
+    \begin{align*}
+      &let\ X=[p,t]^T\\
+      &p\in\R^{10},t\in\R\\
+      \min_{X}\ &
+                  \begin{bmatrix}
+                    0^T & 1
+                  \end{bmatrix} X\\
+      s.t.\ &
+              \begin{bmatrix}
+                1^T & 0\\
+                10..1 & 0
+              \end{bmatrix} X =
+                        \begin{bmatrix}
+                          0\\1
+                        \end{bmatrix}\\
+      &
+        \begin{bmatrix}
+          I & -1_{10\times 1}\\
+          -I & -1_{10\times 1}
+        \end{bmatrix} \leq 0_{20\times 1}
+    \end{align*}
+    \pagebreak
+    \begin{align*}
+      L(p,t,\lambda,v) &= t + \lambda_1^T(p-t) + \lambda_2^T(-p-t) + v_1^T1^Tp + v_2^T([10,..,1]p-1)\\
+      g(\lambda,v) &= \inf_{p,t} L(p,t,\lambda,v)\\
+                       &=
+                         \begin{cases}
+                           -v_2, & \lambda_1 - \lambda_2 + 1v_1 + [10,..,1]^Tv_2 = 0, 1-1^T\lambda_1-1^T\lambda_2 = 0\\
+                           -\infty, & o/w
+                         \end{cases}
+    \end{align*}
+    Dual:
+    \begin{align*}
+      &let\ X = [\lambda_1,\lambda_2,v_1,v_2]^T\\
+      \max_{X} &
+                 \begin{bmatrix}
+                   0^T & 0^T & 0 & -1
+                 \end{bmatrix}X\\
+      s.t.\ &
+              \begin{bmatrix}
+                I_{10\times 10} & -I_{10\times 10} & 1_{10\times 1} & [10..1]^T\\
+                -1^T & -1^T & 0 & 0
+              \end{bmatrix}X =
+                                  \begin{bmatrix}
+                                    0_{10\times 1}\\
+                                    -1
+                                  \end{bmatrix}\\
+      &\begin{bmatrix}
+        -I_{10\times 10} & 0_{10\times 10} & 0_{10\times 2}\\
+        0_{10\times 10} & -I_{10\times 10} & 0_{10\times 2}
+      \end{bmatrix} X \leq 0_{20\times 1}
+    \end{align*}
+    Solve using Matlab:\\
+    $cost_{optimal}=0.04$\\
+    Primal solution:\\
+    $(\forall i \in \{1,..,5\})\ p(i)=0.04$\\
+    $(\forall i \in \{6,..,10\})\ p(i)=-0.04$\\
+    $t=0.04$\\
+    
+    Dual solution:\\
+    $\lambda_1 = [0.2,0.16,0.12,0.08,0.04,0,0,0,0,0]$\\
+    $\lambda_2 = [0,0,0,0,0,0,0.04,0.08,0.12,0.16]$\\
+    $v_1=0.2, v_2 =-0.04$
+
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=10cm]{q7/q7_c_1.png}
+    \includegraphics[width=10cm]{q7/q7_c_2.png}
+    \includegraphics[width=10cm]{q7/q7_c_3.png}
+  \end{figure}
+
+\begin{verbatim}
+%% part c
+f = [zeros(10,1); 1]
+A = [eye(10) -ones(10,1); -eye(10) -ones(10,1)]
+b= [zeros(20,1)]
+
+Aeq = [ones(1,10) 0; 10:-1:1 0]
+beq = [0;1]
+[xs,fval,exitflag,output,lambda] = linprog(f,A,b,Aeq,beq)
+
+force = xs(1:10)
+plot(1:10,force)
+title('force vs t')
+
+v = zeros(11,1)
+for i=2:1:11
+    v(i) = v(i-1) + force(i-1)
+end
+
+plot(0:1:10,v)
+title('velocity vs t')
+
+x = zeros(11,1)
+for i=1:1:11
+    if i > 1
+        x(i) = x(i-1) + v(i)
+    else
+        x(i) = v(i)
+    end
+end
+
+plot(0:1:10,x)
+title('displacement vs t')
+\end{verbatim}
   \end{enumerate}
   
 \end{enumerate}
