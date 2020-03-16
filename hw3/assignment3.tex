@@ -168,7 +168,7 @@
   \end{align*}
   
   Relaxation of ith constraint by $\alpha$ percent:\\
-  $\partial p^*(u_i,0) &= -\lambda_i^*\partial u_i$\\
+  $\partial p^*(u_i,0) = -\lambda_i^*\partial u_i$\\
   $\partial u_i = \alpha \implies$ objective function of log transformed problem experiences a decrease in value by $\lambda_i \alpha$\\
   Converting objective back via inverse of log: $x \to e^{y}$\\
   $z$ small $\implies e^{z} \approx 1+ z$ via Taylor expansion\\
@@ -259,7 +259,7 @@
       &(\exists i)(b-Ax)_i > 0 \vee (\exists i)(-x)_i > 0\\
       &suppose:\\
       &(\exists i)(b-Ax)_i > 0 \wedge (-x)_i < 0 \implies\\
-      &\lambda_1^*^T(b-Ax^*)_i + \lambda_2^*^T(-x^*)_i = 0,\ where\ \lambda_{1_i}^* = -\alpha \lambda_{2_i}^*, \alpha > 0\\
+      &\lambda_1^*^T(b-Ax^*)_i + \lambda_2^*^T(-x^*)_i = 0,\ where\ \lambda_{1_i}^* = \alpha \lambda_{2_i}^*, \alpha > 0, \lambda_{1_i}^* < 0, \lambda_{2_i}^* < 0\\
       % &\lambda_1, \lambda_2\ can\ be\ unbounded\ below,\ not\ satisfying\ dual\ feasibility:\ \lambda_1 \not\succeq 0 \vee \lambda_2 \not\succeq 0\\
       &suppose:\\
       &(\exists i,j,i\not=j)(b-Ax)_i > 0 \wedge (b-Ax)_j > 0 \wedge (b-Ax)_i = 0, (b-Ax)_j = 0\implies\\
