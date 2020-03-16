@@ -47,25 +47,28 @@
   %   \end{cases}
 
 \lhead{Convex Optimization - HW3}
-\rhead{(Bill) Yuan Liu, 996954078, 2020/03/06}
+\rhead{(Bill) Yuan Liu, 996954078, 2020/03/16}
 
 \begin{enumerate}
 \item Q 5.12 textbook\\
-  Derive dual problem for: $min_x - \sum_i log(b_i-a_i^Tx), x: a_i^Tx \leq b_i, \forall i \in \{1,..,m\}$
+  Derive dual problem for: $min_x - \sum_i log(b_i-a_i^Tx), x: a_i^Tx < b_i, \forall i \in \{1,..,m\}$
   \begin{align*}
-    &y_i = b_i-a_i^Tx\\
-    &a_i^Tx \leq b_i\\
+    &let\ y_i = b_i-a_i^Tx > 0\\
+    &a_i^Tx < b_i\ relax\ to\ a_i^Tx \leq b_i\\
     &L(x,y,\lambda,v)=-\sum_i log y_i + \sum_i \lambda_i(a_i^Tx-b_i) + \sum_i v_i(y_i+a_i^Tx-b_i)\\
     &g(\lambda,v)=\inf_{x,y} L(x,y,\lambda,v)\\
     &g(\lambda,v)=\inf_{x,y}-\sum_i log y_i + \sum_i \lambda_i(a_i^Tx-b_i) + \sum_i v_i(y_i+a_i^Tx-b_i)\\
-    &(\exists i)\lambda_i \neq 0 \implies \lambda_i(a_i^Tx-b_i)\ unbounded,\ so\ \lambda = 0\\
+    &(\exists i)\lambda_i > 0 \wedge a_i^Tx - b_i < 0 \implies \lambda_i(a_i^Tx-b_i)\ unbounded,\ so\ \lambda \leq 0\\
+    &\lambda \geq 0 \wedge \lambda \leq 0 \implies \lambda = 0\\
     &g(\lambda,v)=\inf_{x,y}-\sum_i log y_i + \sum_i v_i(y_i+a_i^Tx-b_i)\\
     &g(\lambda,v)=\inf_{x,y}-\sum_i log y_i + v^Ty + v^TAx - v^Tb\\
-    &(\exists i)v_i < 0 \implies v^Ty\ unbounded,\ so\ v \succeq 0\\
-    &\frac{\partial}{\partial y_i}-\sum_i log y_i + v^Ty + v^TAx - v^Tb=-\frac{1}{y_i} + v_i=0\\
+    &y_i > 0 \implies -log y_i\ decreasing\\
+    &y_i > 0 \wedge (\exists v_i < 0) \implies \inf_{y_i} -log y_i + v_i y_i\ \to -\infty,\ so\ v \succeq 0\\
+    &\frac{\partial}{\partial y_i}(-\sum_i log y_i + v^Ty + v^TAx - v^Tb)=-\frac{1}{y_i} + v_i=0\\
+    &(\forall i) \frac{\partial}{\partial y_i}(-\frac{1}{y_i} + v_i)>0 \implies convexity\\
     &y_i = \frac{1}{v_i}, v_i \neq 0\\
     &(\forall i) v_i \neq 0 \wedge v_i \geq 0 \implies v \succ 0\\
-    &\frac{\partial}{\partial x}-\sum_i log y_i + v^Ty + v^TAx - v^Tb=A^Tv=0\\
+    &\frac{\partial}{\partial x}(-\sum_i log y_i + v^Ty + v^TAx - v^Tb)=A^Tv=0\\
     &g(\lambda,v)=
       \begin{cases}
         -\sum_i log \frac{1}{v_i} + \sum_i \frac{v_i}{v_i} - v^Tb, & \text{if } A^Tv=0 \wedge v \succ 0\\
@@ -86,6 +89,7 @@
     s.t.\ & Gx=h            
   \end{align*}
   \begin{align*}
+    &affine\ equality\ constraints\ only \implies Slater's\ condition\ satisfied\\
     &f_0 = x^TA^TAx + 2b^TAx + b^Tb\\
     &h_0 = Gx-h\\
     &L(x,\lambda,v) = f_0 + v^Th_0\\
@@ -122,17 +126,17 @@
 \item Q 5.35 Sensitivity analysis of GP\\
   After log tranformation:
   \begin{align*}
-    &\min_y f_0(y)\\
+    &\min_y log f_0(y)\\
     s.t.\ & log f_i(y) \leq 0\\
     & log h_i(y) = 0
   \end{align*}
   Perturbed problem:
   \begin{align*}
-    &\min_y f_0(y)\\
+    &\min_y log f_0(y)\\
     s.t.\ & log f_i(y) \leq u_i\\
     & log h_i(y) = v_i
   \end{align*}
-  where $y_i = log(x_i)$\\
+  where $y_i = log(x_i), x_i > 0$\\
   
   Let $L$:=Lagrangian of original problem after log transform\\
   Let $L'$:=Lagrangian of perturbed problem after log transform\\
@@ -145,17 +149,15 @@
   \begin{align*}
   \max_{\lambda,w} p(u,v) &= p^*(u,v) = \max_{\lambda,w} \inf_y L(y,\lambda,w) - \lambda^Tu- w^Tv\\
     let\ p(0,0) &= \max_{\lambda,w} \inf_y L(y,\lambda,w)\\
-    p^*(u,v) &= p(0,0) + (\max_{\lambda,w} -\lambda^Tu- w^Tv)
+    p^*(u,v) &= p(0,0) + (\max_{\lambda,w} -\lambda^Tu- w^Tv)\\
+    \lambda & \succeq 0
   \end{align*}
-  \\
   
   let\ $\lambda^*, w^*$ be parameters for optimal $p(u,v)$
   \begin{align*}
     p^*(u,v) &= p(0,0) -{\lambda^*}^Tu- {w^*}^Tv\\
-             u\ not\ present\ &in\ original\ problem \implies\\
-    \frac{\partial}{\partial u_i}p(0,0) &= 0, \forall i\\
-             v\ not\ present\ &in\ original\ problem \implies\\
-    \frac{\partial}{\partial v_i}p(0,0) &= 0, \forall i\\
+             u\ not\ present\ &in\ original\ problem \implies \frac{\partial}{\partial u_i}p(0,0) = 0, \forall i\\
+             v\ not\ present\ &in\ original\ problem \implies \frac{\partial}{\partial v_i}p(0,0) = 0, \forall i\\
     \frac{\partial}{\partial u_i} p^*(u,v) &= -\lambda_i^*, \forall i\\
     \frac{\partial}{\partial v_i} p^*(u,v) &= -w_i^*, \forall i
   \end{align*}
@@ -170,7 +172,7 @@
   $\partial u_i = \alpha \implies$ objective function of log transformed problem experiences a decrease in value by $\lambda_i \alpha$\\
   Converting objective back via inverse of log: $x \to e^{y}$\\
   $z$ small $\implies e^{z} \approx 1+ z$ via Taylor expansion\\
-  $e^{-\lambda_i^* \alpha} \approx 1 - \lambda_i^* \alpha \implies$ objective function experiences an improvement of $\lambda_i^* \alpha$ percent since it is a minimization problem.\\
+  $e^{-\lambda_i^* \alpha} \approx 1 - \lambda_i^* \alpha, \lambda_i^* \geq 0 \implies$ objective function experiences an improvement of $\lambda_i^* \alpha$ percent since it is a minimization problem.\\
   \pagebreak
 \item Q 5.42. Find Lagrange dual problem in inequality form.
   \begin{align*}
@@ -183,7 +185,7 @@
     g (\lambda,v) &= \inf_x L(x,\lambda,v)\\
     g (\lambda,v) &=
                     \begin{cases}
-                      -\lambda^Tb, & c^Tx + \lambda^TAx = 0\\
+                      -\lambda^Tb, & c + A^T\lambda = 0\\
                       -\infty, & o/w
                     \end{cases}
   \end{align*}
@@ -221,44 +223,53 @@
       Dual:\\
       \max_{\lambda_1,\lambda_2}\ & b^T\lambda_1\\
       s.t.\ & c - A^T\lambda_1 - \lambda_2 = 0\\
-      \\
-      g(\lambda,v) &\leq c^Tx^*\ (weak\ duality)\\
-      primal\ & unbounded:\ c^Tx^*= -\infty \implies\\
-      g(\lambda,v) &= -\infty \implies c -A^T\lambda_1-\lambda_2 \neq 0 \implies infeasible\ case\ of\ dual
+      \lambda_1 & \geq 0\\
+      \lambda_2 & \geq 0
     \end{align*}
-  \item b) if the primal is infeasible then the dual is either infeasible or unbounded
+  \begin{align*}
+    &g(\lambda,v) \leq c^Tx^*\\
+    &primal\ unbounded:\ c^Tx^*= -\infty \implies g(\lambda,v) = -\infty \implies\\
+    &c -A^T\lambda_1-\lambda_2 \neq 0 \implies infeasible\ case\ of\ dual
+  \end{align*}
+  \pagebreak
+\item b) if the primal is infeasible then the dual is either infeasible or unbounded\\
+  
+  primal infeasible:
     \begin{align*}
-      &primal\ infeasible \implies b-Ax \not\leq 0 \vee -x \not\leq 0\\
-      &\min_x c^Tx +\lambda_1^T(b-Ax) + \lambda_2^T(-x) \leq c^Tx\\
-      % &(\forall i) (b-Ax)_i > 0 \implies \lambda_{1_i}\ may\ be\ nagative\\
-      % &(\forall i) (-x)_i > 0 \implies \lambda_{2_i}\ may\ be\ nagative\\
+      &(\exists i) (b-Ax)_i > 0 \vee (\exists i) (-x)_i > 0\\
       \\
-      &dual\ unbounded\ case:\\
-      &suppose\ c - A^T\lambda_1 - \lambda_2 = 0,\ substitute\ for\ \lambda_1:\\
-      &Dual: \max_{\lambda_1,\lambda_2}\ b^T\lambda_1 = \max_{\lambda_1,\lambda_2} b^TA^{-T}c-b^TA^{-T}\lambda_2,\ such\ that:\\
-      &(\forall i) (b-Ax)_i > 0 \implies \lambda_{1_i}\ may\ be\ nagative,\ and\\
-      &(\forall i) (-x)_i > 0 \implies \lambda_{2_i}\ may\ be\ nagative,\ and\\
-      &c - A^T\lambda_1 - \lambda_2 = 0\\
+      &g(\lambda_1,\lambda_2) = \inf_x c^Tx +\lambda_1^T(b-Ax) + \lambda_2^T(-x) \leq c^Tx\\
+      &\lambda_1 \succeq 0\\
+      &\lambda_2 \succeq 0\\
+      % &g(\lambda_1,\lambda_2) = c^Tx^* +\lambda_1^T(b-Ax^*) + \lambda_2^T(-x^*) \leq c^Tx^*\\
+      &g(\lambda_1,\lambda_2) = \inf_x c^Tx +\lambda_1^T(b-Ax) + \lambda_2^T(-x)\\
+      &dual: \max_{\lambda_1,\lambda_2} g(\lambda_1,\lambda_2)\\
+      % &let\ x^*\ be\ optimal,\ disregarding\ infeasibility\ of\ the\ primal\\
+      &let\ x^*\ be\ optimal\ for\ g(\lambda_1,\lambda_2) = c^Tx^* +\lambda_1^T(b-Ax^*) + \lambda_2^T(-x^*)\\
+      &if\ x^*\ is\ primal\ infeasible:\\
+      &\lambda_1 \succeq 0, \lambda_2 \succeq 0 \wedge (\exists i) (b-Ax^*)_i > 0 \wedge \lambda_{1_i} \to +\infty \implies \max_{\lambda_1, \lambda_2} g(\lambda_1,\lambda_2) \to +\infty\\
+      &\lambda_1 \succeq 0, \lambda_2 \succeq 0 \wedge (\exists i) (-x^*)_i > 0 \wedge \lambda_{2_i} \to +\infty \implies \max_{\lambda_1, \lambda_2} g(\lambda_1,\lambda_2) \to +\infty\\
+      &dual\ is\ unbounded\ in\ this\ case\\
       \\
-      &let\ d = b^TA^{-T}c\\
-      &let\ e^T = b^TA^{-T}\\
-      &Dual: \max_{\lambda_1,\lambda_2}\ d-e^T\lambda_2\\
-      &(\exists i) e_i > 0: select\ \lambda_{2_i} \to -a \ and\ (\exists i) e_i < 0: select\ \lambda_{2_i} \to a, a \to +\infty \ such\ that\ it\ satisfies:\\
-      &c - A^T\lambda_1 - \lambda_2 = 0,\ then\ e^T\lambda_2\ is\ unbounded\\
-      &eg: c=\begin{bmatrix}0\\0\end{bmatrix}, b=\begin{bmatrix}1\\-1\end{bmatrix},A=I, Ax \not\succeq b, x \not\succeq 0\\
-      &Dual:\ \max_{\lambda_1,\lambda_2}\ d- I^T\begin{bmatrix}1\\-1\end{bmatrix}^T\lambda_2,\ select\ \lambda_2 =\begin{bmatrix}-a\\a\end{bmatrix}\\
-      &c-A^T\lambda_1-\lambda_2 =0=\begin{bmatrix}0\\0\end{bmatrix} - \lambda_1 - \begin{bmatrix}-a\\a\end{bmatrix} = 0\\
-      &select:\ \lambda_1 =\begin{bmatrix}a\\-a\end{bmatrix}\\
-      &let\ a \to +\infty \implies \max_{\lambda_1,\lambda_2}\ d - I^T\begin{bmatrix}1\\-1\end{bmatrix}^T\lambda_2\bigg|_{\lambda_2=[-a,a]^T} = d + 2a = +\infty \implies dual\ unbounded\\
+      &suppose\ optimal\ value\ of\ dual\ exists\ with:\\
+      &\max_{\lambda_1,\lambda_2} c^Tx^* +\lambda_1^T(b-Ax^*) + \lambda_2^T(-x^*) = c^Tx^*\\
+      &c^Tx^* +\lambda_1^*^T(b-Ax^*) + \lambda_2^*^T(-x^*) = c^Tx^*\\
+      &\lambda_1^*^T(b-Ax^*) + \lambda_2^*^T(-x^*) = 0\\
+      &primal\ infeasibility\ enforces:\\
+      &(\exists i)(b-Ax)_i > 0 \vee (\exists i)(-x)_i > 0\\
+      &suppose:\\
+      &(\exists i)(b-Ax)_i > 0 \wedge (-x)_i < 0 \implies\\
+      &\lambda_1^*^T(b-Ax^*)_i + \lambda_2^*^T(-x^*)_i = 0,\ where\ \lambda_{1_i}^* = -\alpha \lambda_{2_i}^*, \alpha > 0\\
+      % &\lambda_1, \lambda_2\ can\ be\ unbounded\ below,\ not\ satisfying\ dual\ feasibility:\ \lambda_1 \not\succeq 0 \vee \lambda_2 \not\succeq 0\\
+      &suppose:\\
+      &(\exists i,j,i\not=j)(b-Ax)_i > 0 \wedge (b-Ax)_j > 0 \wedge (b-Ax)_i = 0, (b-Ax)_j = 0\implies\\
+      &\lambda_1^*^T(b-Ax^*)_i + \lambda_1^*^T(b-Ax^*)_j = 0,\ where\ \lambda_{1_i}^* = -\alpha \lambda_{1_j}^*, \alpha > 0\\
+      &similiarily\ for:\ (\exists i,j)(b-Ax)_i > 0 \wedge (-x)_j > 0\ and\ (\exists i,j,i\not=j)(-x)_i > 0 \wedge (-x)_j > 0\\
       \\
-      &dual\ infeasible\ case:\\
-      &suppose: c > 0, x \not\geq 0, A=-1, Ax \geq b\\
-      &Ax \geq b \implies \lambda_1 \geq 0\\
-      &x < 0 \implies \lambda_2 \leq 0\\
-      &c-A^T\lambda_1-\lambda_2 = c+\lambda_1 - \lambda_2\\
-      &c+\lambda_1>0 \wedge -\lambda_2 \geq 0 \implies c-A^T\lambda_1-\lambda_2 \not=0 \implies dual\ is\ not\ feasible
+      &\lambda_1,\lambda_2\ can\ be\ chosen\ such\ that\ \lambda_1 \not\succeq 0 \vee \lambda_2 \not\succeq 0,\ thus\ not\ satisfying\ dual\ feasibility.\\
     \end{align*}
   \end{itemize}
+  \pagebreak
 \item Game Theory
   \begin{align*}
     &\min_x \max_y x^TPy\\
@@ -317,16 +328,15 @@
       g(\lambda_1,\lambda_2) & = \inf_x x^TPy + \lambda_1^T(Ax-b) + \lambda_2^T(Cy-d)\\
       & =
         \begin{cases}
-          -\lambda_1^Tb + \lambda_2^T(Cy-d), & P^y + A^T\lambda_1 = 0\\
+          -\lambda_1^Tb + \lambda_2^T(Cy-d), & Py + A^T\lambda_1 = 0\\
           - \infty, & o/w
         \end{cases}\\
       max_{\lambda_1,\lambda_2} g(\lambda_1,\lambda_2) & = \max_{\lambda_1,\lambda_2} -\lambda_1^Tb + \lambda_2^T(Cy-d)\\
       s.t.\ & P^Ty + A^T\lambda_1 = 0\\
       &\lambda_1 \geq 0\\
       &\lambda_2 \geq 0\\
-      &Ax-b \leq 0\\
-      &Cy-d \leq 0\\
-      &\lambda_2^T(Cy-d)  \leq 0 \implies\\
+      % &Ax-b \leq 0\\
+      &Cy-d \leq 0 \implies \lambda_2^T(Cy-d)  \leq 0 \implies\\
       \max_{\lambda_1,\lambda_2} & \ g(\lambda_1,\lambda_2) = \max_{\lambda_1,\lambda_2} -\lambda_1^Tb\\
       s.t.\ & P^Ty + A^T\lambda_1 = 0\\
       &\lambda_1 \geq 0\\
@@ -340,16 +350,16 @@
   \item show the above problems have the same optimal value (min-max equals max-min)
     \begin{align*}
       \min_{x,\lambda}&\ d^T \lambda\\
-      s.t.\ & C^T\lambda = P^x\\
+      s.t.\ & C^T\lambda = P^T x\\
                        &Ax \leq b\\
                        &\lambda \geq 0\\
       \\
       g(a_1,a_2,w) &= \inf_{x,\lambda} d^T\lambda + a_1^T(Ax-b)+a_2^T(-\lambda) + w^T(C^T\lambda-P^Tx)\\
       s.t.\ &a_1 \geq 0\\
                        &a_2 \geq 0\\
-      &Ax-b \leq 0\\
-                       &-\lambda \leq 0\\
-                       &C^T\lambda - P^Tx = 0\\
+      % &Ax-b \leq 0\\
+                       % &-\lambda \leq 0\\
+                       % &C^T\lambda - P^Tx = 0\\
       g(a_1,a_2,w) &=
                      \begin{cases}
                        -a_1^Tb , & d-a_2+Cw=0 \wedge A^Ta_1-Pw=0\\
@@ -369,9 +379,6 @@
                       &v \geq 0\\
     \end{align*}
     We start with equivalent formulation of min-max and arrive at a equivalent formulation of max-min problem thus they obtain the same optimal value.
-  \end{enumerate}
-  \begin{enumerate}
-  \item 
   \end{enumerate}
   \pagebreak
   
@@ -550,7 +557,7 @@ title('displacement vs t')
           \begin{bmatrix}
             0\\1
           \end{bmatrix}\bigg| = 0.2222\\
-        &\bigg\|\begin{bmatrix}
+        &\|A^T \lambda\|_{\infty} = \bigg\|\begin{bmatrix}
           1^T & 0^T\\
           10,9,..1 & 0^T
         \end{bmatrix}^T \lambda\bigg\|_{\infty} = 1\\
