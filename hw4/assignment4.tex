@@ -1,0 +1,114 @@
+\documentclass[12pt,letter]{article}
+
+%% \usepackage[fleqn]{amsmath}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amsfonts,amsthm,bm}
+\usepackage{breqn}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{tikz}
+\usepackage{algorithm2e}
+\usepackage{siunitx}
+\usepackage{graphicx}
+\usepackage{subcaption}
+%% \usepackage{datetime}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{mathrsfs}
+\usepackage{fancyhdr}
+\usepackage{fancyvrb}
+\usepackage{parskip} %turns off paragraph indent
+\usepackage{float}
+\usepackage{empheq}
+
+\pagestyle{fancy}
+
+\usetikzlibrary{arrows}
+
+\DeclareMathOperator*{\argmin}{argmin}
+\newcommand*{\argminl}{\argmin\limits}
+
+\newcommand{\mathleft}{\@fleqntrue\@mathmargin0pt}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\ppartial}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\norm}[1]{\|#1\|}
+\newcommand{\set}[1]{\{#1\}}
+\newcommand{\notimplies}{\;\not\!\!\!\implies}
+
+\setcounter{MaxMatrixCols}{20}
+
+\begin {document}
+
+  % \begin{cases}
+  %     0, & \text{if}\ a=1 \\
+  %     1, & \text{otherwise}
+  %   \end{cases}
+
+\lhead{Convex Optimization - HW4}
+\rhead{(Bill) Yuan Liu, 996954078, 2020/03/20}
+
+\begin{enumerate}
+  \item SDP Relaxation and Heuristics for Two-Way Partitioning Problem
+  \begin{enumerate}
+  \item Q 5.39 textbook\\
+    \begin{align*}
+      min\ x^T W x\\
+      s.t.\ x_i^2 = 1, \forall i \in \{1,..,n\}\\
+    \end{align*}
+    \begin{enumerate}
+    \item
+    Show that the two-way partitioning problem can be cast as
+    \begin{align*}
+      min\ tr(WX)\\
+      s.t.\ X \succeq 0, rank(X)=1\\
+      X_{ii}=1, \forall i \in \{1,..,n\}
+    \end{align*}
+
+    \begin{align*}
+      &x^T W x = tr(x^T W x)=tr(Wxx^T)\\
+      &let\ X=xx^T\\
+      &(\forall i) x_i^2 = 1 \iff x_i = \{-1,1\} \implies x^TIx = n\\
+      &x^TIx = tr(xx^T)=n\\
+      &((\exists i)X_{ii}=-1 \wedge (\forall i,j) X_{ij} = \{-1,1\} \implies tr(X) < n)\\
+      &thus, (\forall i)X_{ii}=1\ for\ tr(X)=n\\
+      \\
+      &X=xx^T=x
+      \begin{bmatrix}
+        a_1 & a_2 & .. & a_n
+      \end{bmatrix} =
+                         \begin{bmatrix}
+                           a_1 x & a_2 x & .. & a_n x
+                         \end{bmatrix}, a_i \in \R, x \in \R^n\\
+      &(\forall i)(\exists j) \beta_{ij} a_i x = a_j x \implies \beta_{ij} a_i x - a_j x = 0\\
+      &let\ \gamma_{ij} = \beta_{ij} a_i - a_j\\
+      &\gamma_{ij} x = 0\\
+      &x\not=0 \implies (\forall i)(\exists j) \gamma_{ij} = 0 \implies linear\ dependence\ between\ column\ vectors\ of\ X\\
+      &thus,\ rank(X)=1\\
+      \\
+      &(\forall w) w^TXw = w^Txx^Tw = (x^Tw)^T x^Tw\\
+      &(\forall i)(\forall w)(x^Tw)_i (x^Tw)_i \geq 0 \implies (\forall w)(x^Tw)^T (x^Tw) \geq 0 \iff X\ is\ SPD\\
+      \\
+      &Combining\ all\ constraints\ and\ objective\ forms\ the\ desired\ result
+    \end{align*}
+    \pagebreak
+  \item
+    SDP relaxation of two-way partitioning problem. Using the formulation in part (a), we can form the relaxation:
+    \begin{align*}
+      min tr(W X)\\
+      s.t.\ X \succeq 0\\
+      X_{ii} = 1, \forall i \in \{1,..,n\}
+    \end{align*}
+    This problem is an SDP, and therefore can be solved efficiently. Explain why its optimal value gives a lower bound on the optimal value of the two-way partitioning problem (5.113). What can you say if an optimal point $X^*$ for this SDP has rank one?
+    \begin{align*}
+      X \succeq 0 \wedge X_{ii} = 1, \forall i \in \{1,..,n\} \implies\ (\forall i) \lambda_i(X) \geq 1\\
+      
+    \end{align*}
+    \end{enumerate}
+  \item Q 11.23(b-d) textbook
+  \end{enumerate}
+  \item Interior Point Method
+\end{enumerate}
+
+\end {document}
