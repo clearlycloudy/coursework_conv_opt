@@ -20,6 +20,7 @@
 \usepackage{parskip} %turns off paragraph indent
 \usepackage{float}
 \usepackage{empheq}
+\usepackage{enumitem}
 
 \pagestyle{fancy}
 
@@ -143,7 +144,7 @@
       &s.t.\ W + diag(v) \succeq Z^*, Z^*=0 \implies \\
       &s.t.\ W + diag(v) \succeq 0
     \end{align*}
-    This is equivalent to  dual of the original problem, then $X^*$ obtains same solution as the original problem where $x^*x^*^T=X^*$.
+    This solution is equivalent to the solution of the dual of the original problem. Thus, if $rank(X^*)=1$ of the relaxed problem, $X^*$ obtains the same solution as the original problem where $x^*x^*^T=X^*$ as required.
     \pagebreak
   \item
     We now have two SDPs that give a lower bound on the optimal value of the two-way partitioning problem (5.113): the SDP relaxation (5.115) found in part (b), and the Lagrange dual of the two-way partitioning problem, given in (5.114). What is the relation between the two SDPs? What can you say about the lower bounds found by them? Hint: Relate the two SDPs via duality.
@@ -184,7 +185,11 @@
   \pagebreak
   
 \item Q 11.23(b-d) textbook
-  
+  \begin{itemize}
+  \item b) heuristic partitioning\\
+  \item c) randomized method\\
+  \item d) greedy heuristic refinement\\
+  \end{itemize}
   \end{enumerate}
   \item Interior Point Method
 \end{enumerate}
