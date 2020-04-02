@@ -28,6 +28,9 @@
 \DeclareMathOperator*{\argmin}{argmin}
 \newcommand*{\argminl}{\argmin\limits}
 
+\DeclareMathOperator*{\argmax}{argmax}
+\newcommand*{\argmaxl}{\argmax\limits}
+
 \newcommand{\mathleft}{\@fleqntrue\@mathmargin0pt}
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\Z}{\mathbb{Z}}
@@ -71,8 +74,9 @@
       &let\ X=xx^T\\
       &(\forall i) x_i^2 = 1 \iff x_i = \{-1,1\} \implies x^TIx = n\\
       &x^TIx = tr(xx^T)=n\\
-      &((\exists i)X_{ii}=-1 \wedge (\forall i,j) X_{ij} = \{-1,1\} \implies tr(X) < n)\\
-      &thus, (\forall i)X_{ii}=1\ for\ tr(X)=n\\
+      &(\forall i,j) X_{ij} = \{-1,1\}\\
+      &((\exists i)X_{ii}=-1 \implies tr(X) < n)\\
+      &thus, for\ tr(X)=n: (\forall i)X_{ii}=1\\
       \\
       &X=xx^T=x
       \begin{bmatrix}
@@ -84,29 +88,103 @@
       &(\forall i)(\exists j) \beta_{ij} a_i x = a_j x \implies \beta_{ij} a_i x - a_j x = 0\\
       &let\ \gamma_{ij} = \beta_{ij} a_i - a_j\\
       &\gamma_{ij} x = 0\\
-      &x\not=0 \implies (\forall i)(\exists j) \gamma_{ij} = 0 \implies linear\ dependence\ between\ column\ vectors\ of\ X\\
+      &x\not=0 \implies ((\forall i)(\exists j) \gamma_{ij} = 0 \implies linear\ dependence\ between\ all\ column\ vectors\ of\ X)\\
       &thus,\ rank(X)=1\\
       \\
       &(\forall w) w^TXw = w^Txx^Tw = (x^Tw)^T x^Tw\\
-      &(\forall i)(\forall w)(x^Tw)_i (x^Tw)_i \geq 0 \implies (\forall w)(x^Tw)^T (x^Tw) \geq 0 \iff X\ is\ SPD\\
-      \\
-      &Combining\ all\ constraints\ and\ objective\ forms\ the\ desired\ result
+      &(\forall i, w)(x^Tw)_i (x^Tw)_i \geq 0 \implies (\forall w)(x^Tw)^T (x^Tw) \geq 0 \iff X\ is\ SPD
     \end{align*}
+    Combining all constraints and objective forms the desired result.
     \pagebreak
   \item
     SDP relaxation of two-way partitioning problem. Using the formulation in part (a), we can form the relaxation:
     \begin{align*}
-      min tr(W X)\\
+      min\ tr(W X)\\
       s.t.\ X \succeq 0\\
       X_{ii} = 1, \forall i \in \{1,..,n\}
     \end{align*}
     This problem is an SDP, and therefore can be solved efficiently. Explain why its optimal value gives a lower bound on the optimal value of the two-way partitioning problem (5.113). What can you say if an optimal point $X^*$ for this SDP has rank one?
     \begin{align*}
-      X \succeq 0 \wedge X_{ii} = 1, \forall i \in \{1,..,n\} \implies\ (\forall i) \lambda_i(X) \geq 1\\
-      
+      &L(X,Z,v) = tr(WX) - tr(XZ) + tr(diag(v)diag(X)-I)\\
+      &L(X,Z,v) = -tr(diag(v)I) + tr(WX) - tr(XZ) + tr(diag(v)diag(X))\\
+      &g(Z,V) =
+        \begin{cases}
+          -1^T v ,& W - Z + diag(v) \succeq 0\\
+          -\infty ,& o/w
+        \end{cases}\\
+      &dual\ problem:\\
+      &\max_{Z,v} -1^T v\\
+      &s.t.\ W - Z + diag(v) \succeq 0\\
+      &Z \succeq 0
     \end{align*}
+    % Dual of original problem (5.114):
+    % \begin{align*}
+    %   &maximize\ -1^T v\\
+    %   &s.t.\ W + diag(v) \succeq 0
+    % \end{align*}
+    % It is evident that solution to the dual of relaxed problem has a tightened inequality constraint due to $Z$.
+    % \begin{align*}
+    %   &W + diag(v) \succeq Z\\
+    % \end{align*}
+    % This leads to potentially bigger $v$ and hence potentially larger objective value to dual maximization problem (smaller objective value to the primal minimization problem). Thus, solution of relaxed problem provides a lower bound to the the original problem.\\
+    
+    % \pagebreak
+    
+    If an optimal point $X^*$ for the relaxed problem has rank one:\\
+    $X^*$ has minimal possible rank and $X^*\not=0$, $X^*\succeq 0$.\\
+    $X^*\succeq 0$, so primal feasible.\\
+    Functions are all differentiable, KKT conditions apply at optimality where there exists a dual solution.\\
+    Dual of relaxed problem is feasible: $W + diag(v) \succeq Z, Z\succeq 0$\\
+    Using complementary slackness: $X^*\neq 0, -tr(X^*Z^*) = 0 \implies Z^* = 0$.\\
+    
+    Dual problem of relaxed problem at optimality:
+    \begin{align*}
+      &\max_{v,Z} -1^T v = [\max_{v}\ -1^T v]_{Z=Z^*}\\
+      &s.t.\ W + diag(v) \succeq Z^*, Z^*=0 \implies \\
+      &s.t.\ W + diag(v) \succeq 0
+    \end{align*}
+    This is equivalent to  dual of the original problem, then $X^*$ obtains same solution as the original problem where $x^*x^*^T=X^*$.
+    \pagebreak
+  \item
+    We now have two SDPs that give a lower bound on the optimal value of the two-way partitioning problem (5.113): the SDP relaxation (5.115) found in part (b), and the Lagrange dual of the two-way partitioning problem, given in (5.114). What is the relation between the two SDPs? What can you say about the lower bounds found by them? Hint: Relate the two SDPs via duality.
+    \begin{align*}
+      (5.115)\ &min\ tr(W X)\\
+               &s.t.\ X \succeq 0\\
+               &X_{ii} = 1, \forall i \in \{1,..,n\}
+    \end{align*}
+    \begin{align*}
+      (5.114)\ &maximize\ -1^T v\\
+               &s.t.\ W + diag(v) \succeq 0
+    \end{align*}    
+    % \pagebreak
+    Taken from previous section, dual of relaxed problem:
+    \begin{align*}
+      &L(X,Z,v) = tr(WX) - tr(XZ) + tr(diag(v)diag(X)-I)\\
+      &L(X,Z,v) = -tr(diag(v)I) + tr(WX) - tr(XZ) + tr(diag(v)diag(X))\\
+      &g(Z,V) =
+        \begin{cases}
+          -1^T v ,& W - Z + diag(v) \succeq 0\\
+          -\infty ,& o/w
+        \end{cases}
+    \end{align*}
+    Dual problem:
+    \begin{align*}
+      &\max_{Z,v} -1^T v\\
+      &s.t.\ W - Z + diag(v) \succeq 0\\
+        &Z \succeq 0
+      \end{align*}
+
+      It is evident that solution to the dual of relaxed problem has a tightened generalized inequality constraint due to $Z$ compared to (5.114):
+      \begin{align*}
+        &W + diag(v) \succeq Z
+      \end{align*}
+      This leads to potentially bigger $v$ and hence potentially larger objective value of dual maximization problem (smaller objective value to the primal minimization problem). Thus, solution of relaxed problem provides a lower bound to the the original problem.\\
     \end{enumerate}
-  \item Q 11.23(b-d) textbook
+    
+  \pagebreak
+  
+\item Q 11.23(b-d) textbook
+  
   \end{enumerate}
   \item Interior Point Method
 \end{enumerate}
