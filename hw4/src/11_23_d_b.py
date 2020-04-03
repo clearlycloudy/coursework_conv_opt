@@ -1,55 +1,35 @@
-# need these packages:
 import cvxpy as cp
 import numpy as np
-import matplotlib.pylab as pl
-import scipy.sparse as sps
-import seaborn as sns
 from scipy.io import loadmat
-from os.path import dirname, join as pjoin
 import numpy.linalg as linalg
+import math
 
-def solve(W):
-    print("problem size:", W.shape[0])
+def solve_heur(W):
     
     #dual of original:
-    print("dual of original:")
     dim = W.shape[0]
     v = cp.Variable((dim,1))
     constraints = [W + cp.diag(v) >> 0]
     prob = cp.Problem(cp.Maximize( -cp.sum(v) ),
                       constraints)
     prob.solve()
-
-    print("prob.status:", prob.status)
     
     lower_bound = 0
-    
     if prob.status not in ["infeasible", "unbounded"]:
-        # Otherwise, problem.value is inf or -inf, respectively.
         print("Optimal value: %s" % prob.value)
         lower_bound = prob.value
 
     print("lower_bound:", lower_bound)
 
-    # for variable in prob.variables():
-    #     print("Variable %s: value %s" % (variable.name(), variable.value))
-
     #dual of relaxed:
-    print("dual of relaxed:")
     X = cp.Variable((dim,dim))
     constraints = [X >> 0, cp.diag(X) == np.ones((dim,))]
     prob = cp.Problem(cp.Minimize( cp.trace(cp.matmul(W,X)) ),
                       constraints)
     prob.solve()
-
-    print("prob.status:", prob.status)
     
     if prob.status not in ["infeasible", "unbounded"]:
-        # Otherwise, problem.value is inf or -inf, respectively.
         print("Optimal value: %s" % prob.value)
-
-    # for variable in prob.variables():
-    #     print("Variable %s: value %s" % (variable.name(), variable.value))
 
     ret = prob.variables()[0].value
     eigenValues, eigenVectors = linalg.eig(ret)
@@ -57,23 +37,55 @@ def solve(W):
     idx = eigenValues.argsort()[::-1]
     eigenValues = eigenValues[idx]
     eigenVectors = eigenVectors[:,idx]
-    # print("eigenvalues:",eigenValues)
-    # print("eigenVectors:",eigenVectors)
-    # print("eigenvec w/ largest eigenvalue: ")
-    # print(eigenVectors[0])
-    # print("sign(eigenvec) w/ largest eigenvalue: ")
-    # print(np.sign(eigenVectors[0]))
+    
     x_approx = np.sign(eigenVectors[0])[:,np.newaxis]
     p_heuristic = (x_approx.T).dot(W).dot(x_approx)
     print("heuristic objective: ", p_heuristic)
-    print("-----")
-    return p_heuristic, x_approx
+
+    return p_heuristic, x_approx.T
     
+def greedy(x,W):
+    xx = x
+    val = (xx.T).dot(W).dot(xx)
+    while True:
+        idx = None
+        for i in range(0, xx.size):
+            y = xx
+            y[i] = -y[i]
+            v = (y.T).dot(W).dot(y)
+            if v < val:
+                val = v
+                idx = i
+        if idx is None:
+            break
+        else:
+            xx[i] = -xx[i]
+    return val, xx
+
+def solve_d_b(W):
+    
+    print("performing greedy search")
+    dim = W.shape[0]
+    best_val = math.inf
+    best_x = None
+    _, xs = solve_heur(W)
+    
+    for i in range(0,xs.shape[0]):
+        val, xx = greedy(xs[i,:].T, W)
+        if val < best_val:
+            best_val = val
+            best_x = xx
+            
+    print("problem size:", W.shape[0])
+    print("best objective (heuristic+greedy): ", best_val )
+    print("-----")
+    return best_val, best_x
+
 m = loadmat('../data/hw4data.mat')
 w5 = np.array(m['W5'])
 w10 = np.array(m['W10'])
 w50 = np.array(m['W50'])
 
-solve(w5)
-solve(w10)
-solve(w50)
+solve_d_b(w5)
+solve_d_b(w10)
+solve_d_b(w50)

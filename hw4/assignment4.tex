@@ -188,27 +188,102 @@
   
   \begin{tabular}{|c|c|c|c|c|}\hline
           & SDP bound (11.66)& Optimum & b (11.67)& c \\ \hline
-    small & -5.33445288482 &  & -12.30891878 & -5.33440509588\\ \hline
-    medium & 42.2266162135 &  & 13.05483539 & -39.220002609\\ \hline
-    large & -66.0855132055 & x & -2135.80923688 & -660.557123191\\ \hline
+    small & 5.33445288482 & 5.33440509588 & 12.30891878 & 5.33440509588\\ \hline
+    medium & -42.2266162135 & -38.3691372273  & -13.05483539 & -38.3691372273\\ \hline
+    large & 66.0855132055 & x & 2135.80923688 & 457.832259292\\ \hline
   \end{tabular}
 
     \begin{tabular}{|c|c|c|c|}\hline
       & d-a & d-b & d-c\\ \hline
-      small & & &\\ \hline
-      medium & & & \\ \hline
-      large & & &\\ \hline
-    \end{tabular}
-\pagebreak
-    \begin{itemize}
-    \item b) heuristic partitioning
+      small & 5.33440509588 & 12.3089187826 &5.33440509588\\ \hline
+      medium & -38.3691372273& -16.4179991404 &-38.3691372273 \\ \hline
+      large & 1053.83794696& 1401.39879583 &424.105035811\\ \hline
+    \end{tabular}\\
+
+    Comparison of heuristic parition (b) to SDP bound:\\
+    All obtained objetive values are within the expected range given by SDP lower bound, they do not close to the lower bound.\\
+
+    Comparison of randomized method (c) to SDP bound:\\
+    All obtained objective values are within the expected range given by SDP lower bound, and they are all closer to the SDP bound compared to (b)\\
+
+    100 random samples + greedy single coordinate search (d-a):\\
+    The obtained objective values work well for small to medium dimension sized problems since it effetively cover a majority of permutations possible, but becomes less effective for large problems due to exponential dimensionality explosion.\\
+    
+    Single heuristic solution + greedy single coordinate search (d-b):\\
+    As expected, the obtained objective values are equivalent or better than Heuristic parition (b) alone, but is dependent on heuristic solution as the algorithm is greedy. Local search is show to have bigger marginal impact for higher dimensional problem.
+
+    Randomized method + greedy single coordinate search (d-c):\\
+    As expected, the obtained objective values are equivalent or better than randomized method (c) alone. Local search is show to have bigger marginal impact for higher dimensional problem. Local search plus randomized method seems to give a good balance in practice.
+    
+    \pagebreak
+
+    Optimum (exhaustive):
 \begin{verbatim}
 import cvxpy as cp
 import numpy as np
 from scipy.io import loadmat
-from os.path import dirname, join as pjoin
 import numpy.linalg as linalg
+import math
+import copy
 
+def gen_seq_exhaustive(dim):
+    
+    q = [[1], [-1]]
+
+    while len(q[0]) < dim:
+        qq =[]
+        for i in q:
+            a = copy.deepcopy(i)
+            b = copy.deepcopy(i)
+            a.append(1)
+            b.append(-1)
+            s = len(i)
+            assert(len(a)==len(b))
+            assert(len(a)==s+1)
+            qq.append(a)
+            qq.append(b)
+        q = qq
+
+    ret = np.zeros((len(q), dim))
+    idx = 0
+    for i in q:
+        ret[idx,:] = i
+        idx += 1
+
+    return ret
+\end{verbatim}
+    \pagebreak
+\begin{verbatim}
+def solve_d_exhaustive(W):
+    dim = W.shape[0]
+    samples = gen_seq_exhaustive(dim)
+    best_val = math.inf
+    best_x = None
+    for i in range(0, samples.shape[0]):
+        x = samples[i,:].T
+        v = (x.T).dot(W).dot(x)
+        if v < best_val:
+            best_val = v
+            best_x = x
+            
+    print("problem size:", W.shape[0])
+    print("best_objective (exhaustive): ", best_val)
+    print("-----")
+    return best_val, best_x
+    
+m = loadmat('../data/hw4data.mat')
+w5 = np.array(m['W5'])
+w10 = np.array(m['W10'])
+
+solve_d_exhaustive(w5)
+solve_d_exhaustive(w10)
+\end{verbatim}
+
+    
+\pagebreak
+    \begin{itemize}
+    \item b) heuristic partitioning
+\begin{verbatim}
 def solve(W):
     print("problem size:", W.shape[0])
     
@@ -220,15 +295,15 @@ def solve(W):
     prob = cp.Problem(cp.Maximize( -cp.sum(v) ),
                       constraints)
     prob.solve()
+
     print("prob.status:", prob.status)
     
     lower_bound = 0
+    
     if prob.status not in ["infeasible", "unbounded"]:
-        # Otherwise, problem.value is inf or -inf, respectively.
         print("Optimal value: %s" % prob.value)
         lower_bound = prob.value
 
-    lower_bound = -lower_bound
     print("lower_bound:", lower_bound)
 
     #dual of relaxed:
@@ -238,10 +313,10 @@ def solve(W):
     prob = cp.Problem(cp.Minimize( cp.trace(cp.matmul(W,X)) ),
                       constraints)
     prob.solve()
+
     print("prob.status:", prob.status)
     
     if prob.status not in ["infeasible", "unbounded"]:
-        # Otherwise, problem.value is inf or -inf, respectively.
         print("Optimal value: %s" % prob.value)
 
     ret = prob.variables()[0].value
@@ -253,7 +328,6 @@ def solve(W):
     x_approx = np.sign(eigenVectors[0])[:,np.newaxis]
     p_heuristic = (x_approx.T).dot(W).dot(x_approx)
     print("heuristic objective: ", p_heuristic)
-    print("heuristic objective - lower_bound: ", p_heuristic - lower_bound)
     print("-----")
     
 m = loadmat('../data/hw4data.mat')
@@ -271,7 +345,6 @@ solve(w50)
 import cvxpy as cp
 import numpy as np
 from scipy.io import loadmat
-from os.path import dirname, join as pjoin
 import numpy.linalg as linalg
 import math
 
@@ -286,50 +359,43 @@ def solve(W):
     prob = cp.Problem(cp.Maximize( -cp.sum(v) ),
                       constraints)
     prob.solve()
-
-    print("prob.status:", prob.status)
     
     lower_bound = 0
-    
     if prob.status not in ["infeasible", "unbounded"]:
-        # Otherwise, problem.value is inf or -inf, respectively.
         print("Optimal value: %s" % prob.value)
         lower_bound = prob.value
-        
-    lower_bound = -lower_bound
+
     print("lower_bound: ", lower_bound)
 
     #dual of relaxed:
-    print("dual of relaxed:")
-    
-    #restrict to PSD for randomized sampling
-    #on proper covariance matrix later
-    X = cp.Variable((dim,dim), PSD=True)
-    
+
+    X = cp.Variable((dim,dim))
     constraints = [X >> 0, cp.diag(X) == np.ones((dim,))]
     prob = cp.Problem(cp.Minimize( cp.trace(cp.matmul(W,X)) ),
                       constraints)
-    prob.solve(solver=cp.SCS, max_iters=4000, eps=1e-11, warm_start=True)
-
-    print("prob.status:", prob.status)
+    prob.solve(solver=cp.SCS, max_iters=4000,
+               eps=1e-11, warm_start=True)
     
     if prob.status not in ["infeasible", "unbounded"]:
-        # Otherwise, problem.value is inf or -inf, respectively.
         print("Optimal value: %s" % prob.value)
     
     ret = prob.variables()[0].value
-    eigenValues, eigenVectors = linalg.eig(ret)
 
     K = 100 #number of samples
     xs_approx = np.random.multivariate_normal(np.zeros((dim,)),
                                               ret, size=(K))
-    xs_approx = np.sign(xs_approx)
-    ps = xs_approx.dot(W).dot(xs_approx.T)
-    p_best = np.amin(ps)
+    xs_approx = np.sign(xs_approx) #shape: (K,dim)
+
+    p_best = math.inf
+    for i in range(0,K):
+        p = (xs_approx[i,:].dot(W)).dot(xs_approx[i,:].T)
+        if p < p_best:
+            p_best = p
+
     print("best objective (randomized): ", p_best, "size: ", K)
-    print("objective delta: best objective - lower_bound: ",
-          p_best - lower_bound)
     print("-----")
+
+    return p_best, xs_approx
     
 m = loadmat('../data/hw4data.mat')
 w5 = np.array(m['W5'])
@@ -342,6 +408,246 @@ solve(w50)
 \end{verbatim}
       \pagebreak
     \item d) greedy heuristic refinement\\
+      
+      d-a (100 randomized initial points, single coordinate greedy search):
+\begin{verbatim}
+#generate samples each having dim numbers in {-1,1}
+def gen_seq(dim, samples):
+    return np.sign(np.random.rand(samples, dim) - 0.5)
+    
+def greedy(x,W):
+    xx = x
+    val = (xx.T).dot(W).dot(xx)
+
+    while True:
+        idx = None
+        for i in range(0, xx.size):
+            y = xx
+            y[i] = -y[i]
+            v = (y.T).dot(W).dot(y)
+            if v < val:
+                val = v
+                idx = i
+        if idx is None:
+            break
+        else:
+            xx[i] = -xx[i]
+    return val, xx
+
+def solve_d_a(W):
+    dim = W.shape[0]
+    K = 100
+    samples = gen_seq(dim, K)
+    best_val = math.inf
+    best_x = None
+    for i in range(0,samples.shape[0]):
+        x = samples[i,:].T
+        val, xx = greedy(x, W)
+        if val < best_val:
+            best_val = val
+            best_x = xx
+            
+    print("problem size:", W.shape[0])
+    print("best_objective: ", best_val)
+    print("-----")
+    return best_val, best_x
+    
+m = loadmat('../data/hw4data.mat')
+w5 = np.array(m['W5'])
+w10 = np.array(m['W10'])
+w50 = np.array(m['W50'])
+
+solve_d_a(w5)
+solve_d_a(w10)
+solve_d_a(w50)
+\end{verbatim}
+
+      \pagebreak
+      
+      d-b (a heuristic solution + single coordinate greedy search):
+
+\begin{verbatim}
+def solve_heur(W):
+    
+    #dual of original:
+    dim = W.shape[0]
+    v = cp.Variable((dim,1))
+    constraints = [W + cp.diag(v) >> 0]
+    prob = cp.Problem(cp.Maximize( -cp.sum(v) ),
+                      constraints)
+    prob.solve()
+    
+    lower_bound = 0
+    if prob.status not in ["infeasible", "unbounded"]:
+        print("Optimal value: %s" % prob.value)
+        lower_bound = prob.value
+
+    print("lower_bound:", lower_bound)
+
+    #dual of relaxed:
+    X = cp.Variable((dim,dim))
+    constraints = [X >> 0, cp.diag(X) == np.ones((dim,))]
+    prob = cp.Problem(cp.Minimize( cp.trace(cp.matmul(W,X)) ),
+                      constraints)
+    prob.solve()
+    
+    if prob.status not in ["infeasible", "unbounded"]:
+        print("Optimal value: %s" % prob.value)
+
+    ret = prob.variables()[0].value
+    eigenValues, eigenVectors = linalg.eig(ret)
+
+    idx = eigenValues.argsort()[::-1]
+    eigenValues = eigenValues[idx]
+    eigenVectors = eigenVectors[:,idx]
+    
+    x_approx = np.sign(eigenVectors[0])[:,np.newaxis]
+    p_heuristic = (x_approx.T).dot(W).dot(x_approx)
+    print("heuristic objective: ", p_heuristic)
+
+    return p_heuristic, x_approx.T
+    
+def greedy(x,W):
+    xx = x
+    val = (xx.T).dot(W).dot(xx)
+    while True:
+        idx = None
+        for i in range(0, xx.size):
+            y = xx
+            y[i] = -y[i]
+            v = (y.T).dot(W).dot(y)
+            if v < val:
+                val = v
+                idx = i
+        if idx is None:
+            break
+        else:
+            xx[i] = -xx[i]
+    return val, xx
+
+def solve_d_b(W):
+    
+    print("performing greedy search")
+    dim = W.shape[0]
+    best_val = math.inf
+    best_x = None
+    _, xs = solve_heur(W)
+    
+    for i in range(0,xs.shape[0]):
+        val, xx = greedy(xs[i,:].T, W)
+        if val < best_val:
+            best_val = val
+            best_x = xx
+            
+    print("problem size:", W.shape[0])
+    print("best objective (heuristic+greedy): ", best_val )
+    print("-----")
+    return best_val, best_x
+
+m = loadmat('../data/hw4data.mat')
+w5 = np.array(m['W5'])
+w10 = np.array(m['W10'])
+w50 = np.array(m['W50'])
+
+solve_d_b(w5)
+solve_d_b(w10)
+solve_d_b(w50)
+\end{verbatim}
+      
+      \pagebreak
+      
+      d-c (100 samples from randomized method + single coordinate greedy search):
+
+\begin{verbatim}
+def solve_rand(W):  
+    #dual of original:
+    print("dual of original:")
+    dim = W.shape[0]
+    v = cp.Variable((dim,1))
+    constraints = [W + cp.diag(v) >> 0]
+    prob = cp.Problem(cp.Maximize( -cp.sum(v) ),
+                      constraints)
+    prob.solve()
+    
+    lower_bound = 0
+    if prob.status not in ["infeasible", "unbounded"]:
+        print("Optimal value: %s" % prob.value)
+        lower_bound = prob.value
+
+    print("lower_bound: ", lower_bound)
+
+    #dual of relaxed:
+
+    #restrict to PSD for randomized sampling
+    #on proper covariance matrix later
+    X = cp.Variable((dim,dim), PSD=True)
+    
+    constraints = [X >> 0, cp.diag(X) == np.ones((dim,))]
+    prob = cp.Problem(cp.Minimize( cp.trace(cp.matmul(W,X)) ),
+                      constraints)
+    prob.solve(solver=cp.SCS, max_iters=4000,
+               eps=1e-11, warm_start=True)
+
+    print("prob.status:", prob.status)
+    
+    if prob.status not in ["infeasible", "unbounded"]:
+        print("Optimal value: %s" % prob.value)
+    
+    ret = prob.variables()[0].value
+
+    K = 100 #number of samples
+    xs_approx = np.random.multivariate_normal(np.zeros((dim,)),
+                                              ret, size=(K))
+    xs_approx = np.sign(xs_approx) #shape: (K,dim)
+
+    return xs_approx
+    
+def greedy(x,W):
+    xx = x
+    val = (xx.T).dot(W).dot(xx)
+    while True:
+        idx = None
+        for i in range(0, xx.size):
+            y = xx
+            y[i] = -y[i]
+            v = (y.T).dot(W).dot(y)
+            if v < val:
+                val = v
+                idx = i
+        if idx is None:
+            break
+        else:
+            xx[i] = -xx[i]
+    return val, xx
+
+def solve_d_c(W):
+    
+    print("performing greedy search")
+    dim = W.shape[0]
+    best_val = math.inf
+    best_x = None
+    xs = solve_rand(W)
+    
+    for i in range(0,xs.shape[0]):
+        val, xx = greedy(xs[i,:].T, W)
+        if val < best_val:
+            best_val = val
+            best_x = xx
+            
+    print("problem size:", W.shape[0])
+    print("best objective (randomized+greedy): ", best_val )
+    print("-----")
+    return best_val, best_x
+
+m = loadmat('../data/hw4data.mat')
+w5 = np.array(m['W5'])
+w10 = np.array(m['W10'])
+w50 = np.array(m['W50'])
+
+solve_d_c(w5)
+solve_d_c(w10)
+solve_d_c(w50)
+\end{verbatim}
     \end{itemize}
     \pagebreak    
   \end{enumerate}
