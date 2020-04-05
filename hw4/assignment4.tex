@@ -651,7 +651,46 @@ solve_d_c(w50)
     \end{itemize}
     \pagebreak    
   \end{enumerate}
-  \item Interior Point Method
+\item Interior Point Method
+  \begin{align*}
+    \min_x \sum_l \frac{x_l}{c_l-x_l}\\
+    s.t.\ A^+x = s\\
+    Bx \leq b\\
+    c_l \geq x_l \geq 0, \forall l \in \set{1,..,L}
+  \end{align*}
+  \begin{itemize}
+  \item a) verify minimum-delay problem is a convex optimization problem.\\
+    \begin{align*}
+      &f_0(x) = \sum_l \frac{x_l}{c_l-x_l}\\
+      &f_1(x) = Bx - b\\
+      &f_2(x) = x - c \leq 0\\
+      &f_3(x) = -x \leq 0\\
+      &h(x) = A^+x -s\\
+      \\
+      &reformulation:\\
+      &\min_x f_0(x)\\
+      &s.t.\ h_0(x) = 0\\
+      &f_i(x) \leq 0, \forall i=1,..,3\\
+      \\
+      &f_1,f_2,f_3,h_1\ are\ affine\\
+      &\frac{\partial}{\partial x_i} f_0(x) = \frac{1}{c_i-x_i} + \frac{x_i}{(c_i-x_i)^2}\\
+      &\frac{\partial^2}{\partial x_i^2} f_0(x) = \frac{2}{(c_i-x_i)^2} + \frac{2x_i}{(c_i-x_i)^3}\\
+      &\frac{\partial^2}{\partial x_i x_j} f_0(x)|_{i\not=j} = 0\\
+      &let\ X\ be\ partial\ feasibility\ set\ abiding\ constraints\ f_2, f_3\\
+      &x\in X \implies (\forall i)x_i\in [0,1], (\forall i) x_i \leq c_i \implies \frac{\partial^2}{\partial x_i^2} f_0(x) > 0\\
+      &(\forall x\in X) (\nabla f_0(x)_{ii} > 0 \wedge \nabla f_0(x)_{ij}|_{i\not=j} = 0) \implies \nabla f_0(x) \in S_{++}^L\ for\ overall\ feasibility\ set
+    \end{align*}
+    Thus, it is a convex optimization problem.
+    \pagebreak
+  \item b) Use an interior-point method to find the optimal $x_1,..,x_{13}$. Please use a log barrier function for inequality constraints and use the infeasible-start Newton’s method for the equality constraint. Please write down the relevant gradient, Hessian, and update equations explicitly. What is the minimal delay?
+
+    
+    
+    \pagebreak
+  \item c) Produce a plot of delay vs. the outer-loop iterations (i.e., every time you update t in the barrier function).
+    \pagebreak
+  \item d) Produce a plot of residue (defined as the sum of the norm of residue of the infeasible-start Newton’s method and the residue associated with each outer iteration in the interior-point method, namely $\frac{m}{t}$, i.e., residue = $\norm{r}_2 + \frac{m}{t}$) in log scale vs. the number of inner-loop iterations (i.e., every time you update the flow rate variables).
+  \end{itemize}
 \end{enumerate}
 
 \end {document}
