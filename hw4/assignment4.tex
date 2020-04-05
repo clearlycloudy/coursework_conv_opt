@@ -684,7 +684,94 @@ solve_d_c(w50)
     \pagebreak
   \item b) Use an interior-point method to find the optimal $x_1,..,x_{13}$. Please use a log barrier function for inequality constraints and use the infeasible-start Newton’s method for the equality constraint. Please write down the relevant gradient, Hessian, and update equations explicitly. What is the minimal delay?
 
+    Phase 1 formulation:
+    \begin{align*}
+      \min_{y,x}\ & f = y - \frac{1}{t} \sum_i log(-(f_1(x)_i - y))\\
+                  & - \frac{1}{t} \sum_i log(-(f_2(x)_i - y))\\
+                  & - \frac{1}{t} \sum_i log(-(f_3(x)_i - y))\\
+      s.t.\ &A^{+}x = s
+    \end{align*}
+    Initialize $y$ for feasibility:
+    \begin{align*}
+      y > max \set{max_i f_1(x)_i, max_i f_2(x)_i, max_i f_3(x)_i}
+    \end{align*}
+    Use Log Barrier Method with Infeasible Newton Method to obtain a feasible point such that answer has $y<0$.\\
+
+    Gradient of Phase 1 formulation:
+    \begin{align*}
+      \frac{\partial f}{\partial x_i} & = -\frac{1}{t} \frac{-1}{-x_i+c_i+y} - \frac{1}{t} \frac{1}{c_i+y} - \frac{1}{t} \sum_{j=1}^{3}\bigg(\frac{-B_{ji}}{-(B_{[j,:]}x-b_j-y)}\bigg)\\
+                                      & = \frac{1}{t} \frac{1}{-x_i+c_i+y} - \frac{1}{t} \frac{1}{c_i+y} - \frac{1}{t} \sum_{j=1}^{3}\bigg(\frac{B_{ji}}{B_{[j,:]}x-b_j-y}\bigg)\\
+      \frac{\partial f}{\partial y} & = 1 - \frac{1}{t} \sum_i \frac{1}{-x_i+c_i+y} - \frac{1}{t} \sum_i \frac{1}{x_i+y} - \frac{1}{t} \sum_{j=1}^{3} \frac{1}{-(B_{[j,:]}x-b_i-y)}\\
+      \nabla f(x,y) & =
+                 \begin{bmatrix}
+                   \frac{\partial f}{\partial x_1}\\
+                   ..\\
+                   \frac{\partial f}{\partial x_L}\\
+                   \frac{\partial f}{\partial y}
+                 \end{bmatrix}
+    \end{align*}
+    \pagebreak
     
+    Hessian elements of Phase 1 formulation:
+    \begin{align*}
+      \frac{\partial f^2}{\partial x_i x_j} & = \frac{1}{t} \frac{I_{i=j}}{(-x_i+c_i+y)^2} +\frac{1}{t}\frac{I_{i=j}}{(x_i+y)^2} + \frac{1}{t} \sum_{k=1}^{3} \frac{B_{ki}B_{kj}}{(B_{[k,:]}x-b_k-y)^2}\\
+      \frac{\partial f^2}{\partial y^2} &= \frac{1}{t} \sum_i \frac{1}{(-x_i+c_i+y)^2} + \frac{1}{t} \sum_i \frac{1}{(x_i+y)^2} + \frac{1}{t} \sum_{k=1}^3 \frac{1}{(B_{[k,:]}x-b_k-y)^2}\\
+      \frac{\partial f^2}{\partial x_i \partial y} &= -\frac{1}{t} \frac{1}{(-x_i+c_i+y)^2} + \frac{1}{t} \frac{1}{(x_i+y)^2} - \frac{1}{t} \sum_{k=1}^3 \frac{B_{ki}}{(B_{[k,:]x-b_k-y})^2}\\
+      \nabla^2 f(x,y) & =
+                        \begin{bmatrix}
+                          \frac{\partial f^2}{\partial x_1^2} & .. & \frac{\partial f^2}{\partial x_1 \partial x_L} & \frac{\partial f^2}{\partial x_1 \partial y}\\
+                          .. \\
+                          \frac{\partial f^2}{\partial x_L \partial x_1} & .. & \frac{\partial f^2}{\partial x_L^2} & \frac{\partial f^2}{\partial x_L \partial y}\\
+                          \frac{\partial f^2}{\partial y x_1} & .. & \frac{\partial f^2}{\partial y \partial x_L} & \frac{\partial f^2}{\partial y^2}\\
+                        \end{bmatrix}
+    \end{align*}
+
+    KKT System of Equality constraint Newton Method for direction solver:
+    \begin{align*}
+      \begin{bmatrix}
+        \nabla^2 f(x,y) & [A^{+}\ \vec{0}]^T\\
+        [A^{+}\ \vec{0}] & 0
+      \end{bmatrix}
+      \begin{bmatrix}
+        \Delta x\\
+        v
+      \end{bmatrix}
+      =
+      \begin{bmatrix}
+        -\nabla f(x,y)\\
+        s-[A^{+}\ \vec{0}]
+        \begin{bmatrix}
+          x \\ y
+        \end{bmatrix}
+      \end{bmatrix}
+    \end{align*}
+
+    Residuals:
+    \begin{align*}
+      res_{pri} = s-[A^{+}\ \vec{0}]
+      \begin{bmatrix}
+        x \\ y
+      \end{bmatrix}
+    \end{align*}
+
+    \pagebreak
+    
+    Phase 2 formulation:
+    \begin{align*}
+      \min_{y,x}\ & \sum_i \frac{x_i}{c_i - x_i} -\frac{1}{t} \sum_i log(-(f_1(x)_i - y))\\
+                  & - \frac{1}{t} \sum_i log(-(f_2(x)_i - y))\\
+                  & - \frac{1}{t} \sum_i log(-(f_3(x)_i - y))\\
+      s.t.\ &A^{+}x = s
+    \end{align*}
+
+    Gradient:\\
+    todo\\
+
+    Hessian:\\
+    todo
+
+    Minimal delay:?\\
+    todo
     
     \pagebreak
   \item c) Produce a plot of delay vs. the outer-loop iterations (i.e., every time you update t in the barrier function).
