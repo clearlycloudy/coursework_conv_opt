@@ -64,22 +64,23 @@ def grad_phase1(t, A, B, x, c, b, s):
     gradient = np.zeros((L, 1))
 
     idx_y = L-1
-    gradient[idx_y,0] = 1.0 * t
     
-    for i in range(0,L-1):
-        gradient[i,0] += -1.0 * 1.0/(x[i,0]-c[i,0]-y)
-        gradient[i,0] += -1.0 * 1.0/(x[i,0]+y)
+    for i in range(0,idx_y):
+        gradient[i,0] += -1.0/(x[i,0]-c[i,0]-y)
+        gradient[i,0] += -1.0/(x[i,0]+y)
         gradient[i,0] += -1.0 * ( B[0,i]/(B[0,:].dot(x)-b[0,0]-y) + 
                                   B[1,i]/(B[1,:].dot(x)-b[1,0]-y) +
                                   B[2,i]/(B[2,:].dot(x)-b[2,0]-y) )
 
-    for i in range(0,L-1):
-        gradient[L-1,0] += 1.0 * 1.0/(x[i,0]-c[i,0]-y)
-        gradient[L-1,0] += 1.0 * -1.0/(x[i,0]+y)
+    gradient[idx_y,0] = 1.0 * t
+            
+    for i in range(0,idx_y):
+        gradient[idx_y,0] += 1.0 * 1.0/(x[i,0]-c[i,0]-y)
+        gradient[idx_y,0] += 1.0 * -1.0/(x[i,0]+y)
         
-    gradient[L-1,0] += 1.0 * ( 1.0/(B[0,:].dot(x)-b[0,0]-y) + 
-                               1.0/(B[1,:].dot(x)-b[1,0]-y) +
-                               1.0/(B[2,:].dot(x)-b[2,0]-y) )
+    gradient[idx_y,0] += -1.0 * ( 1.0/(B[0,:].dot(x)-b[0,0]-y) + 
+                                  1.0/(B[1,:].dot(x)-b[1,0]-y) +
+                                  1.0/(B[2,:].dot(x)-b[2,0]-y) )
     
     return gradient
 
@@ -157,8 +158,8 @@ def kkt_matrix_phase1(t, A, B, x, c, b, s):
     #df^2/(dx_i dx_j):
     
     for i in range(0,L-1):
-        m[i,i] += 1.0 * 1.0/np.power(x[i,0]-c[i,0]-y,2)
-        m[i,i] += 1.0 * 1.0/np.power(x[i,0]+y,2)
+        m[i,i] += 1.0/np.power(x[i,0]-c[i,0]-y,2)
+        m[i,i] += 1.0/np.power(x[i,0]+y,2)
     
     for i in range(0,L-1):
         for j in range(0,L-1):
@@ -171,8 +172,8 @@ def kkt_matrix_phase1(t, A, B, x, c, b, s):
     idx_y = L-1
     
     for i in range(0,L-1):
-        m[idx_y, idx_y] += 1.0 * 1.0/np.power(x[i,0]-c[i,0]-y,2)
-        m[idx_y, idx_y] += 1.0 * 1.0/np.power(x[i,0]+y,2)
+        m[idx_y, idx_y] += 1.0/np.power(x[i,0]-c[i,0]-y,2)
+        m[idx_y, idx_y] += 1.0/np.power(x[i,0]+y,2)
 
     m[idx_y, idx_y] +=  1.0 * ( 1.0/np.power(B[0,:].dot(x)-b[0,0]-y,2) +
                                 1.0/np.power(B[1,:].dot(x)-b[1,0]-y,2) +
@@ -180,11 +181,11 @@ def kkt_matrix_phase1(t, A, B, x, c, b, s):
 
     #df/(dx_i d_y):
     for i in range(0,L-1):
-        m[i, idx_y] += -1.0 * 1.0/np.power(x[i,0]-c[i,0]-y,2)
-        m[idx_y, i] += -1.0 * 1.0/np.power(x[i,0]-c[i,0]-y,2)
+        m[i, idx_y] += -1.0/np.power(x[i,0]-c[i,0]-y,2)
+        m[idx_y, i] += -1.0/np.power(x[i,0]-c[i,0]-y,2)
         
-        m[i, idx_y] += 1.0 * 1.0/np.power(x[i,0]+y,2)
-        m[idx_y, i] += 1.0 * 1.0/np.power(x[i,0]+y,2)
+        m[i, idx_y] += 1.0/np.power(x[i,0]+y,2)
+        m[idx_y, i] += 1.0/np.power(x[i,0]+y,2)
 
         m[i, idx_y] += -1.0 * ( B[0,i]/np.power(B[0,:].dot(x)-b[0,0]-y,2) +
                                 B[1,i]/np.power(B[1,:].dot(x)-b[1,0]-y,2) +
@@ -290,7 +291,9 @@ def solve_inner_phase1(t, A, B, x, c, b, s, v):
 
     eps1 = 1e-7
     eps2 = 1e-7
-    
+
+    print("x:", x)
+            
     while True:
         print("loop inner, phase1, t: ", t)
         y = solve_kkt_phase1(t, A, B, x, c, b, s)
@@ -301,17 +304,17 @@ def solve_inner_phase1(t, A, B, x, c, b, s, v):
             v = v_new
         delta_v = v_new - v
         
-        print("v_new:", v_new)
-        print("delta_v: ",  delta_v)
-        print("delta_x", delta_x)
-        print("x_new:", x+delta_x)
+        # print("v_new:", v_new)
+        # print("delta_v: ",  delta_v)
+        # print("delta_x", delta_x)
+        # print("x_new:", x+delta_x)
         
         # print("inner loop, phase1, kkt solve: feasibility var: ", delta_x[-1,0])
         # print(x+delta_x)
         
         #backtracking line search
         beta = 0.95
-        alpha = 0.1
+        alpha = 0.3
         h = 1.0
         
         # print(delta_x)
