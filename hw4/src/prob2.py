@@ -255,7 +255,7 @@ def solve(A, B, x, c, b, s):
     assert(np.all(x>=0))
 
     t = 1.0
-    mu = 10.0
+    mu = 2.0
 
     m = A.shape[0]
     eps = 1e-12
@@ -296,8 +296,11 @@ assert(np.all(B.dot(solution) <= b))
 assert(np.all(solution<=c))
 assert(np.all(solution>=0))
 
+# print(A.dot(solution))
+# print(B.dot(solution))
+
 #delay vs outer iterations
-# pl.plot(record1[0],record1[1])
+pl.plot(record1[0],record1[1])
 pl.ylabel('delay')
 pl.xlabel('outer iterations')
 pl.show()
