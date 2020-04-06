@@ -46,7 +46,7 @@
 \begin {document}
 
 \lhead{Convex Optimization - HW4}
-\rhead{(Bill) Yuan Liu, 996954078, 2020/03/20}
+\rhead{(Bill) Yuan Liu, 996954078, 2020/04/06}
 
 \begin{enumerate}
   \item SDP Relaxation and Heuristics for Two-Way Partitioning Problem
@@ -811,7 +811,7 @@ solve_d_c(w50)
     Inner loop line search: $\alpha = 0.4, \beta =0.95, h_{i+1} = h_i * \beta$\\
     
     Stopping Criterion:\\
-    Line Search: $\|(r_{prim},r_{dual})_{i+1}\| \leq (1-\alpha h)\|(r_{prim},r_{dual})_i\|$\\
+    Line Search: $\|(r_{prim},r_{dual})_{i+1}\|_2 \leq (1-\alpha h)\|(r_{prim},r_{dual})_i\|_2$\\
     Inner loop: $residual_{prim} < 1*10^{-12} \wedge residual_{dual} < 1*10^{-12}$\\
     Outer loop: $\frac{m}{t} < 1*10^{-12}$\\
     
@@ -820,28 +820,42 @@ solve_d_c(w50)
     $res_{dual}^{next} = \nabla f(x,t) + A^{+T} v$\\
 
     \pagebreak
-    Solution:\\
-    
-    Minimal delay: 26.427066103\\
-    Flows:
-    \begin{align*}x=
-      \begin{bmatrix}
-        3.56069375*10^{-01}\\
-        4.87861250*10^{-01}\\
-        3.56069375*10^{-01}\\
-        1.55128906*10^{-01}\\
-        1.55128906*10^{-01}\\
-        8.00940469*10^{-01}\\
-        7.98119062*10^{-01}\\
-        8.00940469*10^{-01}\\
-        6.68561545*10^{-14}\\
-        6.68561545*10^{-14}\\
-        8.00940469*10^{-01}\\
-        7.98119062*10^{-01}\\
-        8.00940469*10^{-01}\\
+    Solution:
+    \begin{align*}
+      &Minimal\ delay: 26.427066103\\
+      \\
+      &x=
+        \begin{bmatrix}
+          3.56069375*10^{-01}\\
+          4.87861250*10^{-01}\\
+          3.56069375*10^{-01}\\
+          1.55128906*10^{-01}\\
+          1.55128906*10^{-01}\\
+          8.00940469*10^{-01}\\
+          7.98119062*10^{-01}\\
+          8.00940469*10^{-01}\\
+          6.68561545*10^{-14}\\
+          6.68561545*10^{-14}\\
+          8.00940469*10^{-01}\\
+          7.98119062*10^{-01}\\
+          8.00940469*10^{-01}\\
+        \end{bmatrix}\\
+      \\
+      &Bx=\begin{bmatrix}
+        0.95606938\\
+        0.95606938\\
+        0.79811906       
+      \end{bmatrix}\\
+      \\
+      &Ax=\begin{bmatrix}
+        1.2\\
+        0.6\\
+        0.6\\
+        -1.55431223*10^{-15}\\
+        0\\0\\0
       \end{bmatrix}
     \end{align*}
-        
+
     \pagebreak
     
     \pagebreak
