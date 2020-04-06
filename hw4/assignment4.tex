@@ -101,7 +101,7 @@
     \end{align*}
     This problem is an SDP, and therefore can be solved efficiently. Explain why its optimal value gives a lower bound on the optimal value of the two-way partitioning problem (5.113). What can you say if an optimal point $X^*$ for this SDP has rank one?
     \begin{align*}
-      &L(X,Z,v) = tr(WX) - tr(XZ) + tr(diag(v)diag(X)-I)\\
+      &L(X,Z,v) = tr(WX) - tr(XZ) + tr(diag(v)(diag(X)-I))\\
       &L(X,Z,v) = -tr(diag(v)I) + tr(WX) - tr(XZ) + tr(diag(v)diag(X))\\
       &g(Z,V) =
         \begin{cases}
@@ -129,10 +129,9 @@
     If an optimal point $X^*$ for the relaxed problem has rank one:\\
     $X^*$ has minimal possible rank and $X^*\not=0$, $X^*\succeq 0$.\\
     $X^*\succeq 0$, so primal feasible.\\
-    Functions are all differentiable, KKT conditions apply at optimality where there exists a dual solution.\\
-    Dual of relaxed problem is feasible: $W + diag(v) \succeq Z, Z\succeq 0$\\
+    Functions are all differentiable, KKT conditions apply at optimality.\\
+    Suppose dual of relaxed problem is feasible: $W + diag(v) \succeq Z, Z\succeq 0$\\
     Using complementary slackness: $X^*\neq 0, -tr(X^*Z^*) = 0 \implies Z^* = 0$.\\
-    
     Dual problem of relaxed problem at optimality:
     \begin{align*}
       &\max_{v,Z} -1^T v = [\max_{v}\ -1^T v]_{Z=Z^*}\\
@@ -155,7 +154,7 @@
     % \pagebreak
     Taken from previous section, dual of relaxed problem:
     \begin{align*}
-      &L(X,Z,v) = tr(WX) - tr(XZ) + tr(diag(v)diag(X)-I)\\
+      &L(X,Z,v) = tr(WX) - tr(XZ) + tr(diag(v)(diag(X)-I))\\
       &L(X,Z,v) = -tr(diag(v)I) + tr(WX) - tr(XZ) + tr(diag(v)diag(X))\\
       &g(Z,V) =
         \begin{cases}
@@ -174,7 +173,7 @@
       \begin{align*}
         &W + diag(v) \succeq Z
       \end{align*}
-      This leads to potentially bigger $v$ and hence potentially larger objective value of dual maximization problem (smaller objective value to the primal minimization problem). Thus, solution of relaxed problem provides a lower bound to the the original problem.\\
+      This leads to potentially smaller $v$ due to extra degrees of freedom provided by $Z$ and hence potentially larger objective value of dual maximization problem (and smaller objective value to the primal minimization problem). Solution of the relaxed problem in general may provide a primal objective value that is lower than one of the original problem in the case where $rank(X)\not=1$.
     \end{enumerate}
     
   \pagebreak
